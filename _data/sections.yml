@@ -1,0 +1,30 @@
+projects:
+  url: /projects
+  heading: Projects
+  words: Projects and experiments I have been working on.
+  class: m7 projects
+  border: projects
+math:
+  url: /math
+  heading: Mathematics
+  words: Seminars papers and talks I gave through my study time, in differents topics.
+  class: m7 projects
+  border: projects
+about:
+  url: /about
+  heading: Sithlord-Dev
+  words: 28, Pure mathematics graduate and programming enthusiast
+  class: m5 about
+  border: about
+resume:
+  url: /resume
+  heading: Resume
+  words: Check out and download my resume
+  class: m6 algorithms
+  border: algorithms
+contact:
+  url: /contact
+  heading: Contact
+  words: Feel free to get in touch!
+  class: m6 contact
+  border: contact

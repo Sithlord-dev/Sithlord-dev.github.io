@@ -1,0 +1,74 @@
+---
+layout: not_homepage
+quote: Pure mathematics is, in its way, the poetry of logical ideas.
+author: Albert Einstein
+---
+
+{% include quote.html quote=page.quote author=page.author %}
+
+<div class="project_list">
+  <h2 class="heading center">Seminars and papers:</h2>
+  {% for project in site.data.math_artic %}
+
+  <div class="row">
+    {% include paper_box.html %}
+    {% endfor %}
+    </div>
+      </div>
+
+  <div class="row">
+    <div class="row">
+    </div>
+  </div>
+
+  <h2 class="heading center">Academic papers:</h2>
+  <div class="row">
+        <div class="col s12 m4">
+          <a href="/docs/Calculations in étale cohomology.pdf"><button type="button" class="fill col s12" name="button">Calculations in étale cohomology</button></a>
+        </div>
+        <div class="col s12 m4">
+          <a href="/docs/Orders and Chow groups.pdf"><button type="button" class="fill col s12" name="button">Orders and Chow groups</button></a>
+        </div>
+        <div class="col s12 m4">
+          <a href="/docs/The p-adic Gamma function.pdf"><button type="button" class="fill col s12" name="button">The p-adic Gamma function</button></a>
+        </div>
+  </div>
+  <div class="row">
+        <div class="col s12 m4">
+          <a href="/docs/Modular symbols.pdf"><button type="button" class="fill col s12" name="button">Modular symbols</button></a>
+        </div>
+        <div class="col s12 m4">
+          <a href="/docs/Triangulability of compact surfaces.pdf"><button type="button" class="fill col s12" name="button">Triangulability of compact surfaces</button></a>
+        </div>
+        <div class="col s12 m4">
+          <a href="/docs/Discretness of the spectrum of the Laplace-Beltrami operator.pdf"><button type="button" class="fill col s12" name="button">Discretness of the spectrum of the Laplace-Beltrami operator</button></a>
+        </div>
+  </div>
+  <div class="row">
+        <div class="col s12 m4">
+          <a href="/docs/The Berkovitch Affine line.pdf"><button type="button" class="fill col s12" name="button">The Berkovitch Affine line</button></a>
+        </div>
+        <div class="col s12 m4">
+          <a href="/docs/Simplicity homeomorphism groups.pdf"><button type="button" class="fill col s12" name="button">Simplicity homeomorphism groups</button></a>
+        </div>
+        <div class="col s12 m4">
+
+        </div>
+  </div>
+</div>
+
+<div class="projects-bottom center-align">
+  <h1 class="heading">Have questions, comments, feedback? Feel free to reach out!</h1>
+  <div class="row">
+    <div class="col m6 offset-m3 s12">
+      <div class="row">
+        <div class="col s6">
+          <a href="/contact"><button type="button" class="fill col s12" name="button">contact</button></a>
+        </div>
+        <div class="col s6">
+          <button type="button" class="fill col s12" id="scroll-top" title="scroll back top" name="button">scroll back top</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

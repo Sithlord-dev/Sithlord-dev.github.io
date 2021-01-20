@@ -1,0 +1,58 @@
+---
+layout: not_homepage
+quote: Becoming sufficiently familiar with something is a substitute for understanding it.
+author: John H. Conway
+---
+
+{% include quote.html quote=page.quote author=page.author %}
+
+<div class="container about_section">
+  <div class="row">
+    <img src="/assets/images/bio2.jpeg" class="col m2 s3 responsive circle about_img" alt="me">
+    <div class="about_paragraph">
+      <p>
+        Hi! My name is Sidi mohammed and I am an aspiring mathematics graduate and a learning programmer! Through all my studies, I gained a rich background in pure mathematics, mostly in Algebra, Geometry and Number Theory.
+      </p>
+      <p>
+        My favourtie part of learning mathematics, was the beautiful connections one builds between different theories from areas areas to solve complicated problems. The focus of my studies lied in the very heart of arithmetic geometry: a lot of abstract thinking, but also, a lot of beautiful and complex connections that made everything look so simple.
+        But mostly, learning math made me want to learn how to code! How so kind sir? might you be wondering... Well, let me show you why in three point:
+      </p>
+      <dl>
+        <dt> <b> Abstraction: </b> </dt>
+        <dd>- Here is one beautiful aspect of abstract reasoning: When you think about a problem, as a sort of puzzle, a big complex construction with a lot of little pieces long enough, tou start realizing that, by arranging objects or actions in a certain order or pattern according to a specific rule or set of rules, you start seeing that everything makes sense!</dd>
+        <dt> <b> Rational and critical thinking: </b> </dt>
+        <dd>- One of my personal favourties, through mathematical reasoning, one uses logic and reasoning to identify the strengths and weaknesses of alternative solutions, conclusions or approaches to problems. In fact, very famous mathematicians (like Eisenstein for example) were known to be obsessed with improving their own reasoning. For a programmer, this translates into writing clean and efficient code.</dd>
+        <dt> <b> Quantitative skills: </b> </dt>
+        <dd>- If you majored in mathematics, then you're already used to spending hours upon hours every day working on difficult problem sets, well, programs just seem like problem sets with more fun to it!</dd>
+      </dl>
+      <!-- <p>
+        But, wonna know the coolest thing? check this out: (the donut thingy)
+      </p> -->
+      <p>
+      I have also had the chance to conduct detailled research, and held math tutoring classes in English and German.
+      </p>
+      <p>
+        I am now looking for new adventures, have a look at my projects: <a class="about_me_links" href="/projects">projects</a> to see what i have done so far, <a class="about_me_links" href="/contact">If you're intersted, then let me know through an email</a> or let's connect on <a class="about_me_links" href="https://www.linkedin.com/in/sidi---/">linkedIn</a>.
+      </p>
+    </div>
+  </div>
+  <h3 class="heading skills_heading center-align">Skills:</h3>
+  <div class="skills_wrapper">
+      {% for tech_group in site.data.skills %}
+        <div class="skill_group">
+          <div class="col m4 s6">
+            <h4 class="heading" style="color:#f5df4e;">{{tech_group.name}}:</h4>
+            <div class="skills">
+              {% for tech in tech_group.skills %}
+              <i class="about_skill_icon devicon-{{tech.class}}"></i><span class="skill_names">{{tech.skill_name}}</span><br/>
+              <div class="skillbar" data-percent={{tech.skill_prc}}>
+	               <div class="skillbar-bar"></div>
+	                <div class="skill-bar-percent"></div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+  </div>
+</div>

@@ -1,0 +1,44 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+
+title: Sidi Mohammed Boughalem
+email: "shinokiz@gmail.com"
+description: >
+  28, Pure Mathematics student. My usual areas of sin: arithmetic geometry, topology and algebraic/analytic Number theory.
+about_me: >
+  Pure mathematics student, with an unconditional passion for mathematics. Through all my studies, I gained a rich background in pure mathematics, mostly in Algebra, Geometry and Number Theory.
+
+  My favourtie part of learning mathematics, was the beautiful connections one builds between different theories from areas areas to solve complicated problems. The focus of my studies lied in the very heart
+  of arithmetic geometry: a lot of abstract thinking, but also, a lot of beautiful and complex connections that made everything look so simple. One of the reasons made me want to learn how to code!
+
+  Besides an aspiring mathematician, I would describe myself as a socialist, a human activist, a metal head and a great fencer.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://sithlord.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
+linked_in_link: "https://www.linkedin.com/in/sidi---/"
+github_link: "https://www.github.com/Sithlord-dev"
+Replit_link: "https://repl.it/@Sithlorddev"
+twitter_username: ""
+google_analytics_id: 'G-MJVPTBN0Y6'
+select_options: clear-filters HTML5 CSS3 SCSS javaScript jQuery materialize charts.js React jekyll Ruby-on-Rails Sinatra front-end back-end finished current
+sass:
+  sass_dir: assets/css/main.css
+  style: :nested
+
+gems:
+  - jekyll-feed
+exclude:
+  - Gemfile
+  - Gemfile.lock

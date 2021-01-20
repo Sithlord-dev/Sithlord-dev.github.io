@@ -1,0 +1,62 @@
+- id: 1
+  title: Bitcoin Transaction Malleability
+  url: /docs/Bitcoin Transaction Malleability.pdf
+  description: A seminar talk about Bitcoin's Transaction Malleability, an example of a security issue in the Bitcoin global cryptocurrency system.
+  cover: /assets/images/bitcoin.jpg
+  img: /assets/images/project_covers/Bitcoin malleability.png
+  tags: [
+                  cryptocurrency,
+                  bitcoin,
+                  malleability-attack,
+                  Mt.Gox incident
+                ]
+
+- id: 2
+  title: The Banach-Tarski paradox
+  url: /docs/The Banach-Tarski Paradox.pdf
+  description: One of the seminar talks I presented at University of Tours, about the Banach-Tarsky Paradox, one of the most famous and disturbing results in mathematics.
+  cover: /assets/images/Banach.jpg
+  img: /assets/images/project_covers/Banach.png
+  tags: [
+                  Pathology,
+                  Non-measurable_sets,
+                  Axiom_of_choice,
+                  Banach_Tarski
+                ]
+
+- id: 3
+  title: Wild automorphisms of the complex field
+  url: /docs/Wild automorphisms of the complex field.pdf
+  description: A fun little presentation I made during my bachelor degree I think, exploring the dark parts of the group of automorphisms of the complex field.
+  cover: /assets/images/Wild.jpg
+  img: /assets/images/project_covers/Wild.png
+  tags: [
+                  Pathology,
+                  Wild_automorphisms,
+                  Zorn's_Lemma,
+                  complex_automorphisms
+                ]
+
+- id: 4
+  title: Hilbert's 5th problem
+  url: /docs/Hilbert's 5th problem.pdf
+  description: Probably one of the first short talks I gave during my Differential geometry class, this one is about characterizing linear Lie groups by Von Neumann's theorem (actually, in the case of closed linear topological groups.)
+  cover: /assets/images/Lie groups.jpg
+  img: /assets/images/project_covers/Lie groups.png
+  tags: [
+                  Lie_groups,
+                  Hilbert_problem,
+                  differentiable_manifolds
+                ]
+
+- id: 5
+  title: The Octahedral group
+  url: /docs/The Octahedral group.pdf
+  description: Little presentation about the study of the isometry group of the Octahedron.
+  cover: /assets/images/Octa.gif
+  img: /assets/images/project_covers/Octa.png
+  tags: [
+                  Octahedral_group,
+                  isometry_group,
+                  Octahedron
+                ]
