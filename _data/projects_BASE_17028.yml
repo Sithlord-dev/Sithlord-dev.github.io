@@ -1,14 +1,8 @@
 - id: 1
   title: Random pile of code
-<<<<<<< HEAD
   url: https://repl.it/repls
-  github_url: https://github.com/users/Sithlord-dev/projects/
+  github_url: https://github.com/users/Sithlord-dev/projects/2
   description: Some bunch of code I wrote on python, for random purpuses, while learning and or for fun.
-=======
-  url: https://repl.it/@Sithlorddev
-  github_url: https://github.com/Sithlord-dev/projects/
-  description: Some bunch of code I wrote on python, for random purpuses, while learning and/or for fun.
->>>>>>> 623abb61edcd9671224a5881f3f3988612345ada
   technologies: [
                   python-plain,
                 ]
