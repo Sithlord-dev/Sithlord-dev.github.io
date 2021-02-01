@@ -7,10 +7,29 @@ author: Monty Python
 {% include quote.html quote=page.quote author=page.author %}
 
 <div class="project_list">
-  <h2 class="heading center"> Projects and experiments:</h2>
+  <h2 class="heading center"> Python coding:</h2>
   {% for project in site.data.projects %}
     {% include project_box.html %}
   {% endfor %}
+
+  <div class="row">
+    <div class="row">
+    </div>
+  </div>
+
+  <h2 class="heading center">Data analysis:</h2>
+  {% for project in site.data.data_analysis %}
+
+  <div class="row">
+  {% include data_a_box.html %}
+  {% endfor %}
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="row">
+  </div>
 </div>
 
 <div class="projects-bottom center-align">
