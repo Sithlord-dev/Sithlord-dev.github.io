@@ -50,3 +50,15 @@
     '/assets/images/project_images/pageview/box_plot.png',
     '/assets/images/project_images/pageview/bar_plot.png',
   ]
+
+- id: 5
+  title: Sea level prediction
+  url: https://mybinder.org/v2/gh/Sithlord-dev/sea_level_predictor/main?filepath=Sea%20rise%20predictor.ipynb
+  github_url: Sithlord-dev/sea_level_predictor
+  description: In this project, we anaylize a dataset of the global average sea level change since 1880 in order to predict the sea level change through the year 2050.
+  technologies: [
+
+                ]
+  images: [
+    '/assets/images/project_images/Sea predic/sea_level_plot.png',
+  ]
