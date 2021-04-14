@@ -8,6 +8,24 @@ function showContactForm(){
 
 }
 
+function new_tab_show_callback() {
+    console.log('showing tab +++++ ' + instance_tabs.index)
+}
+
+var instance_tabs
+
+function materialize_init_tab() {
+
+    elem = $('.tabs')
+
+    options = {
+        duration: 600,
+        onShow: new_tab_show_callback
+    }
+    init_tabs = M.Tabs.init(elem, options);
+    instance_tabs = M.Tabs.getInstance(elem);
+}
+
 function toggleTags(button, tag){
   if(button.attr('class').indexOf('active_tag') > -1){
     button.removeClass("active_tag");

@@ -1,0 +1,214 @@
+<div class="container">
+
+<!-- Start of rows div -->
+<div class="row">
+
+  <div class="col s12 m13" style="padding-top: 30px; padding-right: 30px; padding-left: 30px;">
+   <div class="card z-depth-0" style="padding-top: 20px; padding-right: 10px; padding-left: 10px;">
+   <h3 class="center-align" style="padding-right: 20px; padding-left: 20px;"">Sea level prediction using linear regression</h3>
+   <p class="grey-text center-align"></p>
+   <div class="center-align">
+   <div class="chip">
+      Data Anlaysis
+      </div>
+      <div class="chip">
+      Time series
+      </div>
+      <div class="chip">
+      python
+      </div>
+      <div class="chip">
+      pandas
+      </div>
+    </div>
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+    <p>In this project, we anaylize a dataset of the global average sea level change
+      since 1880 in order to predict the sea level change through the year 2050.</p>
+
+      <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+        <IMG src="da/sealvl/sealvl.jpg" style="display: block; margin-left: auto; margin-right: auto; width: 100%;">
+      </div>
+
+      <p>The data used here are the <a href="https://datahub.io/core/sea-level-rise">Global Average A
+        bsolute Sea Level Change, 1880-2014</a> Data set, from the US Environmental Protection Agency using data from CSIRO, 2015; NOAA, 2015.</p>
+
+    <div id="title1" style="margin-top:50px;">
+      <h4><a href="#title1"><i class="material-icons">code</i></a> Linear regression for time series prediction</h4>
+    </div>
+    <p> We use linear regression get the slope and y-intercept of the line of best fit.
+      We then create a scatter plot with the line through the year 2050 to predict the sea
+      level rise in 2050 and observe the rate of rise since the year 2000.</p>
+
+    <p>To work through these topics, we will use <mark style="background-color: #e4e6e8"><code>pandas</code></mark>, <mark style="background-color: #e4e6e8"><code>matplotlib</code></mark>
+      and <code>linregress</code> from <mark style="background-color: #e4e6e8"><code>scipy.stats</code></mark>'s.</p>
+
+
+    <p style="margin-top:30px;">Let's import the main modules and libraries we will be working with:</p>
+    <pre class="prettyprint">
+<code class="language-python">
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  from scipy.stats import linregress
+</code>
+</pre>
+
+<h5>1. Read data:</h5>
+<pre class="prettyprint">
+<code class="language-python">
+  df = pd.read_csv('files/epa-sea-level.csv', na_values = ['?'])
+</code>
+</pre>
+
+<table border="1" class="striped">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Year</th>
+      <th>CSIRO Adjusted Sea Level</th>
+      <th>Lower Error Bound</th>
+      <th>Upper Error Bound</th>
+      <th>NOAA Adjusted Sea Level</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1880</td>
+      <td>0.000000</td>
+      <td>-0.952756</td>
+      <td>0.952756</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1881</td>
+      <td>0.220472</td>
+      <td>-0.732283</td>
+      <td>1.173228</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1882</td>
+      <td>-0.440945</td>
+      <td>-1.346457</td>
+      <td>0.464567</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1883</td>
+      <td>-0.232283</td>
+      <td>-1.129921</td>
+      <td>0.665354</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1884</td>
+      <td>0.590551</td>
+      <td>-0.283465</td>
+      <td>1.464567</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>We can have a look at how the sampled Data looks like:</p>
+
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="da/sealvl/sea1.png" style="background-color:white;">
+</div>
+
+<p>As we see, the data is a bit scattered. We will use <em>linear regression</em> to find the most fitting model to our prediction. The goal is basically ti find the linear model $y = ax+b $ that fits the most i.e. with the minimum possible loss. For that we use the <strong>least squares regression</strong> which calculates </p>
+<ul>
+<li><p>the slope, given by the equation:</p>
+   <blockquote>$\displaystyle{ a = \frac{ N \sum xy - \sum x \sum y}{N \sum x^2 - \left( \sum x \right)^2 } }$</blockquote>
+</li>
+<li><p>the y-intercept, given by the equation:</p>
+<blockquote>$\displaystyle{  b = \frac{ \sum y - a \sum x}{N}  }$</blockquote>
+</li>
+</ul>
+
+<p>We use the <code>linregress</code> function from <code>scipi.stats</code> to get
+  the slope and y-intercept of the line of best fit:</p>
+
+<pre class="prettyprint">
+<code class="language-python">
+  X = df['Year']
+  Y = df['CSIRO Adjusted Sea Level']
+  model = linregress(X, Y)
+
+  (a, b) = (model.slope, model.intercept)
+</code>
+</pre>
+<p>And we calculate the coordinates of the line of best fit:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  X_1 = list(range(1880, 2050))
+  Y_1 = [ a * x + b for x in X_1 ]
+</code>
+</pre>
+<p>We plot the line of best fit over the scatter plot making pass through our desired
+  sea level prediction (i.e. x = 2050)</p>
+
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="da/sealvl/sea2.png" style="background-color:white;">
+</div>
+
+<h5>2. Comparison of sea rise rate:</h5>
+
+<p>Now we want to plot a new line of best fit sing only the data from year 2000:</p>
+
+<pre class="prettyprint">
+<code class="language-python">
+  mask = (df['Year'] >= 2000)
+  X_rec = df[mask]['Year']
+  Y_rec = df[mask]['CSIRO Adjusted Sea Level']
+  model_rec = linregress(X_rec, Y_rec)
+
+  (a_rec, b_rec) = (model_rec.slope, model_rec.intercept)
+</code>
+</pre>
+<p> and still make it pass by 2050 to see if the rate of rise continues as it has since 2000:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  X_2 = list(range(2000, 2050))
+  Y_2 = [ a_rec * x + b_rec for x in X_2]
+</code>
+</pre>
+
+<p>We can then observe the difference, and how the rate of sea rise went up: </p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="da/sealvl/sea3.png" style="background-color:white;">
+</div>
+<p>It suggests that the level of the sea in 2050 will approximate the value of:</p>
+
+
+<pre class="prettyprint">
+<code class="language-python">
+  print('{:.2f} inch ~ {:.2f} cm'.format(Y_2[-1], Y_2[-1] * 2.54) )
+  <span class="nocode" style="color:white;">
+  >>>
+      15.22 inch ~ 38.65 cm
+</code>
+</pre>
+<p>Here is the full code as a function:</p>
+<iframe frameborder="0" width="100%" height="500px" src="https://replit.com/@Sithlorddev/Sea-level-predictor?lite=true"></iframe>
+<ul>
+  If you are interested in the codes I used/wrote, you can find everything in
+  <li>my Github repository : <i class="material-icons" href="https://github.com/Sithlord-dev/Pageview_timeseries_visualizer">link</i></li>
+  <li>my Colab's notebook : <a href="https://colab.research.google.com/github/Sithlord-dev/Sithlord-dev/Pageview_timeseries_visualizer/blob/main/Page%20view%20time-series%20visualizer.ipynb">
+<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a></li>
+  </ul>
+    </div>
+ </div>
+</div>
+</div>
+</div>
+</div>

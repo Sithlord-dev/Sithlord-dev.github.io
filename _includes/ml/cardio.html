@@ -1,0 +1,629 @@
+<div class="container">
+
+<!-- Start of rows div -->
+<div class="row">
+
+  <div class="col s12 m13" style="padding-top: 30px; padding-right: 30px; padding-left: 30px;">
+   <div class="card z-depth-0" style="padding-top: 20px; padding-right: 10px; padding-left: 10px;">
+     <h3 class="center-align" style="padding-right: 20px; padding-left: 20px;"">Cardiovascular disease classification</h3>
+   <p class="grey-text center-align">15th February 2019</p>
+   <div class="center-align">
+   <div class="chip">
+      Machine learning
+      </div>
+      <div class="chip">
+      binary classification
+      </div>
+      <div class="chip">
+      python
+      </div>
+      <div class="chip">
+      Scikit learn
+      </div>
+    </div>
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+    <p>We will use a basic Machine Learning framework to perform a binary classification
+    task based on clinical examination results performed on patients with and without Cardiovascular
+    disease, in order to train a model to guess if a patient; from his medical attributes;
+    has a cardiovascular disease or not</p>
+
+      <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+        <IMG src="ml/cardio/heart.jpg" data-caption="(mustafahacalaki/DigitalVision Vectors, Getty Images)" style="display: block; margin-left: auto; margin-right: auto; width: 100%;">
+      </div>
+
+      <p>The original data were collected during medical examinations, and belong to
+        the <a href="https://archive.ics.uci.edu/ml/datasets/heart+Disease">Cleveland database</a> from UCI Machine Learning Repository.
+        We use a more compact one with relevant parameters (only 14 features) from : <a href="https://www.kaggle.com/ronitf/heart-disease-uci/">Kaggle</a>.</p>
+
+    <div id="title1" style="margin-top:50px;">
+      <h4><a href="#title1"><i class="material-icons">code</i></a> Cardiovascular disease diafnosis</h4>
+    </div>
+    <p>Here is a short summary of what we will be doing:</p>
+    <ul class="collection">
+    <li class="collection-item"><strong>Data analysis</strong> - We prepare, study and explore the dataset, highliting important correlations.</li>
+    <li class="collection-item"><strong>Model modelling</strong> - we create and train a model to predict a target variable, then we tune the hyper-parameters of our model in order to improve it if possible.</li>
+    <li class="collection-item"><strong>Model evaluation and comparison</strong> - we evaluate it using some metrics and compare them to find the best one.  </li>
+    <li class="collection-item"><strong>Feature importance</strong> - we highlight the important parameters in predictiong the presence of a cardiovascular disease.</li>
+    <li class="collection-item"><strong>Conclusion</strong></li>
+    </ul>
+    <p>Let's import the main modules and libraries we will be working with:</p>
+    <pre class="prettyprint">
+<code class="language-python">
+  ## Data analysis libraries
+  import numpy as np
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  from scipy.stats import linregress
+
+  ## Scikit Learn Models:
+  from sklearn.linear_model import LogisticRegression
+  from sklearn.neighbors import KNeighborsClassifier
+  from sklearn.ensemble import RandomForestClassifier
+  from sklearn.svm import SVC
+  from xgboost import XGBClassifier
+
+  ## Scikit Learn Model evaluators
+  from sklearn.model_selection import train_test_split, cross_val_score
+  from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
+  from sklearn import metrics
+  from sklearn.metrics import confusion_matrix, roc_curve, classification_report
+  from sklearn.metrics import precision_score, recall_score, f1_score
+  from sklearn.metrics import plot_roc_curve
+
+  ## Scikit Learn preprocessing
+  from sklearn.preprocessing import StandardScaler, MinMaxScaler, Normalizer, RobustScaler
+  from sklearn.decomposition import PCA
+</code>
+    </pre>
+<h4> 1. Data analysis: </h4>
+<p>The rows in the dataset represent patients and the columns represent examination results
+from various blood and medical tests.</p>
+<p>We use the dataset to make a prediction on our target variable:</p>
+<table class="striped">
+<thead>
+<tr>
+<th style="text-align:left">Features</th>
+<th style="text-align:left">Variable Type</th>
+<th style="text-align:left">Variable</th>
+<th style="text-align:left">Value Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Age</td>
+<td style="text-align:left">Objective Feature</td>
+<td style="text-align:left">age</td>
+<td style="text-align:left">int(years)</td>
+</tr>
+<tr>
+<td style="text-align:left">Gender</td>
+<td style="text-align:left">Objective Feature</td>
+<td style="text-align:left">sex</td>
+<td style="text-align:left">categorical code: 1 = male; 0 = female</td>
+</tr>
+<tr>
+<td style="text-align:left">Chest pain type</td>
+<td style="text-align:left">Examination Feature</td>
+<td style="text-align:left">cp</td>
+<td style="text-align:left">categorical code : 0: Typical angina; 1: Atypical angina; 2: Non-anginal pain; 3: Asymptomatic</td>
+</tr>
+<tr>
+<td style="text-align:left">Resting blood pressure</td>
+<td style="text-align:left">Examination Feature</td>
+<td style="text-align:left">trestbps</td>
+<td style="text-align:left">float (mm Hg)</td>
+</tr>
+<tr>
+<td style="text-align:left">Serum cholestoral</td>
+<td style="text-align:left">Examination Feature</td>
+<td style="text-align:left">chol</td>
+<td style="text-align:left">float (mg/dl)</td>
+</tr>
+<tr>
+<td style="text-align:left">Fasting blood sugar &gt; 120 mg/dl</td>
+<td style="text-align:left">Examination Feature</td>
+<td style="text-align:left">fbs</td>
+<td style="text-align:left">binary</td>
+</tr>
+<tr>
+<td style="text-align:left">Resting electrocardiographic results</td>
+<td style="text-align:left">Examination Feature</td>
+<td style="text-align:left">restecg</td>
+<td style="text-align:left">categorical code : 0: Nothing to note; 1: ST-T Wave abnormality; 2: Possible or definite left ventricular hypertrophy</td>
+</tr>
+<tr>
+<td style="text-align:left">Maximum heart rate achieved</td>
+<td style="text-align:left">Examination Feature</td>
+<td style="text-align:left">thalach</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:left">Exercise induced angina</td>
+<td style="text-align:left">Examination Feature</td>
+<td style="text-align:left">exang</td>
+<td style="text-align:left">binary</td>
+</tr>
+<tr>
+<td style="text-align:left">ST depression induced by exercise relative to rest</td>
+<td style="text-align:left">Examination Feature</td>
+<td style="text-align:left">oldpeak</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:left">The slope of the peak exercise ST segment</td>
+<td style="text-align:left">Examination Feature</td>
+<td style="text-align:left">slope</td>
+<td style="text-align:left">categorical code : 0: Upsloping; 1: Flatsloping; 2: Downslopins</td>
+</tr>
+<tr>
+<td style="text-align:left">Number of major vessels colored by flourosopy</td>
+<td style="text-align:left">Examination Feature</td>
+<td style="text-align:left">ca</td>
+<td style="text-align:left">int (0-3)</td>
+</tr>
+<tr>
+<td style="text-align:left">Thalium stress result</td>
+<td style="text-align:left">Examination Feature</td>
+<td style="text-align:left">thal</td>
+<td style="text-align:left">int: 1,3: normal; 6: fixed defect; 7: reversable defect</td>
+</tr>
+<tr>
+<td style="text-align:left">Presence or absence of cardiovascular disease</td>
+<td style="text-align:left">Target Variable</td>
+<td style="text-align:left">target</td>
+<td style="text-align:left">binary: 1=yes, 0=no</td>
+</tr>
+</tbody>
+</table>
+
+<p>We start by reading our CSV file using <code>pandas</code></p>
+
+<pre class="prettyprint">
+<code class="language-python">
+  heart_df = pd.read_csv('files/heart.csv')
+  heart_df.head(10)
+</code>
+</pre>
+
+<p>and have a look at how many positive and negative samples there are:</p>
+
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio1.png" style="background-color:white;">
+</div>
+
+<p>Since the values are close to each other, this suggests that the<code>target</code>
+  column can be considered <strong>balanced</strong>. </p>
+<h4>Correlation analysis</h4>
+<p>We first explore some possible correlation between independent variables, as this may suggest which independent variables may or may not have an impact on our target variable:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  corr_mtrx = heart_df.corr()
+</code>
+</pre>
+<p>A correlation matrix tells us how related each variable is to the other. Since
+  correlation matrices are symmetrical, half of it suffices to analyze correctly the data,
+  hence we triangulate it as follow:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  #Mask the upper triangle:
+  mask = np.triu(np.ones(corr_mtrx.shape),0)
+</code>
+</pre>
+<p><code>seaborn</code>'s heatmap is perfect to graphically highlits our correlations:</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio2.png" style="background-color:white;">
+</div>
+<p>A higher positive (resp. negative) value means a potential positive (resp. negative) correlation.
+  For example, we observe a negative correlation between cardiovascular diseases and gender:
+  Indeed, if we look closer, this is partially due to the fact that there are more males
+  patiens than females in the sample:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  heart_df['sex'].value_counts(normalize=True)
+<span class="nocode" style="color:white;">
+  >>>
+  	1    0.683168
+  	0    0.316832
+  	Name: sex, dtype: float64
+</code>
+</pre>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio3.png" style="background-color:white;">
+</div>
+
+<p>We also observe a negative corrolation of <code>target</code> with age, while having
+  a positive correlation with <code>thalac</code>. We try then to understand how age
+  and maximal heart rate relate in accordence to the presence or not of cardiovascular diseases:</p>
+
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio4.png" style="background-color:white;">
+</div>
+
+<p>First, we observe that the maximal heart rate regresses with age: this makes sense,
+  the younger someone is, the higher its maximal heart rate is. What is also interesting
+  is that the regression is more important in patients <span style='color:#502382'><strong>
+    with cardiovascular problems</strong></span>, as the slope of regression is clearly of <code>target = 1</code>
+    is clearly higher than of <code>target = 0</code>.</p>
+
+<p>However, this might also be misleading due to the following fact: If we observe the age distribution of the patients</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio5.png" style="background-color:white;">
+</div>
+<p> the <em>Kernel Density Etimate</em> is slightly swaying to the right, which also r
+  eflects in the scatter plot above as there are more <em>older</em> patients.
+  On the other hand, the highest correlation on the <code>tagret</code> variable is seen
+  with the <em>chest pain</em> variable <code>cp</code>:</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio6.png" style="background-color:white;">
+</div>
+
+<p>After a little bit of research, the <a href="https://www.heart.org/en">American heart association</a> supplies us with the following insights:</p>
+<ul>
+<li><strong>Typical angina</strong>: chest pain or discomfort caused when the heart muscle doesn&#39;t get enough oxygen-rich blood. </li>
+<li><strong>Atypical angina</strong>: chest pain that is not Typical Angina</li>
+<li><strong>Non-anginal pain</strong>: typically esophageal spasms (not related to the heart)</li>
+<li><strong>Asymptomatic</strong>: chest pain not showing signs of any disease</li>
+</ul>
+<p>Here, the fact that the <em>Atypical angina</em> it&#39;s not related to the heart but still seems to have a higher ratio of participants with cardiovascular disease than without. This is due to the actual definition of &#39;Atypical Angina&#39; in the medical field, which seems to be confusing. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2763472/">Source: PubMed</a></p>
+
+<h4>2. Data modelling</h4>
+<p>Here we will try to build a model and train in order to predict our <code>target</code> variable:</p>
+
+<pre class="prettyprint">
+<code class="language-python">
+  np.random.seed(1729)
+
+  X = heart_df.drop('target', axis = 1)
+  y = heart_df['target']
+
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+</code>
+</pre>
+
+<p>Our model is about <strong>classification</strong>, where we are predicting a <strong>categorical variable</strong> : <code>target</code>. It has <strong>labeled data</strong> of less than 100.000 samples. Using Scikit Learn&#39;s <a href="https://scikit-learn.org/stable/user_guide.html">documentation</a> we opt for the following models:</p>
+<ul class="collection">
+<li class="collection-item">Log Reg : <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html">LogisticRegression</a></li>
+<li class="collection-item">K-Nearest Neighbors : <a href="https://scikit-learn.org/stable/modules/neighbors.html">KNeighborsClassifier</a></li>
+<li class="collection-item">Random Forest : <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html">RandomForestClassifier</a></li>
+<li class="collection-item">SVC : <a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC">Support Vector Classification</a></li>
+<li class="collection-item">XGBoost : <a href="https://xgboost.ai/">XGBoost</a>.</li>
+</ul>
+<p>In order to see which model performs the best, we proceed as follow:</p>
+
+<h5>2.1. Instantiate each model in a dictionary:</h5>
+
+<pre class="prettyprint">
+<code class="language-python">
+  models = {'logReg': LogisticRegression(max_iter = 1000),
+            'KNN': KNeighborsClassifier(),
+            'SVC': SVC(),
+            'RandomForestClassifier': RandomForestClassifier(),
+            'XGB': XGBClassifier(use_label_encoder=False)}
+</code>
+</pre>
+
+<h5>2.2 Create function to fit and score models:</h5>
+
+<pre class="prettyprint">
+<code class="language-python">
+  def mod_score(models, X_train, X_test, y_train, y_test):
+    '''
+    Takes a dictionarry of models and fits each on a training set and returns its score on a test set
+    '''
+    # Fix randomness
+    np.random.seed(1729)
+    # empty dict to append
+    results = {}
+
+    for name, model in models.items() :
+        model.fit(X_train, y_train)
+        results[name] = model.score(X_test, y_test)
+
+    return results
+</code>
+</pre>
+
+<h5>2.3 View the results:</h5>
+
+<pre class="prettyprint">
+<code class="language-python">
+  mod_scores = mod_score(models, X_train, X_test, y_train, y_test)
+</code>
+</pre>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio7.png" style="background-color:white;">
+</div>
+
+<h4>3.Model fine tuning</h4>
+<p>We will try and normalize our datasets at first to see if it improves our scores and then fine tune the hyperparameters of our classifiers to get the best possible results:</p>
+
+<h5>3.1. Datasets normalization</h5>
+
+<p>We will choose two types of scaling: MinMax and Robust:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  # Normalized datasets
+  normal = Normalizer()
+  Xn_train = normal.fit_transform(X_train)
+  Xn_test = normal.fit_transform(X_test)
+
+  # Scaled datasets
+  minmax = MinMaxScaler()
+  Xm_train = minmax.fit_transform(X_train)
+  Xm_test = minmax.fit_transform(X_test)
+
+  scaler = RobustScaler()
+  Xsc_train = scaler.fit_transform(X_train)
+  Xsc_test = scaler.fit_transform(X_test)
+</code>
+</pre>
+
+<h4>Hyper-parameters tuning</h4>
+
+<p>For lack of data samples (only 4202) we cannot use a validation set to tune our models, we use <em>k-cross-validation</em> instead. </p>
+<p>We use <code>RandomizedSearchCV</code> :</p>
+<pre class="prettyprint">
+<code class="language-python">
+  # logReg hyperparameters
+  logReg_grid = { 'C': np.logspace(-4, 4, 50),
+           'solver': ['liblinear'],
+         'penalty' : ['l1', 'l2']}
+
+  # RandomForest hyperparameters
+  RandFor_grid = {'n_estimators': np.arange(10, 1000, 50),
+                   'max_depth': [None, 3, 5, 10],
+           'min_samples_split': np.arange(2, 20, 2),
+            'min_samples_leaf': np.arange(1, 20, 2) }
+
+  # KNN hyperparameters
+  KNN_grid = { 'leaf_size' : [i for i in range(1,30)],
+           'n_neighbors' : [i for i in range(1,21)],
+                   'p' : [1,2]
+           }
+
+  # SVC hyperparameters
+  SVC_grid = [{'C': [1, 10, 100, 1000],
+             'kernel': ['linear']},
+            {'C': [0.1, 1, 10, 100],
+            'gamma': [1, 0.1, 0.01, 0.001],
+          'kernel': ['rbf']}]
+
+  # XGB hyperparameters
+  XGB_grid = {'max_dept':range(3,10,2),
+              'max_dept':range(1,6,2),
+              'gamma':[i/10 for i in range(0,5)],
+              'subsample':[i/10 for i in range(6,10)],
+              'colsample_bytree':[i/10 for i in range(6,10)],
+              'reg_alpha':[0, 0.001, 0.005, 0.01, 0.05]}
+</code>
+</pre>
+<p>Here, at least with the modelling that we have been doing, they both somehow come up with the same suggested tuning.</p>
+
+<p>We make a comparison of the progress </p>
+
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="550" src="ml/cardio/cardio8.png" style="background-color:white;">
+</div>
+
+<h4>3.Model evaluation</h4>
+
+<p>Now we want to evaluate our model using the logReg classifier that we have been tuning according to more metrics than just <code>accuracy</code>:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  # Instantiate best model with best hyperparameters
+  clf = LogisticRegression(max_iter = 800,
+                         C = 339.3221771895323,
+                         solver = 'liblinear',
+                         penalty = 'l1').fit(Xn_train, y_train);
+  #make predictions
+  y_preds = clf.predict(Xn_test)
+</code>
+</pre>
+<h5>3.1. Confusion matrix:</h5>
+<p>A visual way to show where our model made nailed its predictions
+  and where it failed:</p>
+  <pre class="prettyprint">
+  <code class="language-python">
+    conf_mtrx = confusion_matrix(y_test, y_preds)
+  </code>
+  </pre>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio9.png" style="background-color:white;">
+</div>
+
+<h5>3.2. ROC Curve and AUC Scores:</h5>
+<p>We basically compare the true positive rate to the false positive rate, i.e. a person that tests positive, but does not actually have the disease vs a person that tests negative although has a cardiovascular disease:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  fpr, tpr, thresholds = roc_curve(y_test, clf.predict_proba(Xn_test)[:, 1])
+</code>
+</pre>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio_miss.png" style="background-color:white;">
+</div>
+<h5>3.3. Classification report</h5>
+
+<p>Now let's have a look on the main classification metrics:</p>
+
+<pre class="prettyprint">
+<code class="language-python">
+  # Create a classification report using the classification_report function
+  report = classification_report(y_test, y_preds, output_dict=True)
+
+  pd.DataFrame(report).T
+</code>
+</pre>
+<table border="1" class="striped" style="margin-bottom:30px;">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>precision</th>
+      <th>recall</th>
+      <th>f1-score</th>
+      <th>support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.923077</td>
+      <td>0.857143</td>
+      <td>0.888889</td>
+      <td>28.000000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.885714</td>
+      <td>0.939394</td>
+      <td>0.911765</td>
+      <td>33.000000</td>
+    </tr>
+    <tr>
+      <th>accuracy</th>
+      <td>0.901639</td>
+      <td>0.901639</td>
+      <td>0.901639</td>
+      <td>0.901639</td>
+    </tr>
+    <tr>
+      <th>macro avg</th>
+      <td>0.904396</td>
+      <td>0.898268</td>
+      <td>0.900327</td>
+      <td>61.000000</td>
+    </tr>
+    <tr>
+      <th>weighted avg</th>
+      <td>0.902864</td>
+      <td>0.901639</td>
+      <td>0.901264</td>
+      <td>61.000000</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>We tweak our previous function in order to evaluate our model on all these metrics:</p>
+
+<pre class="prettyprint">
+<code class="language-python">
+  def eval_mod(model, X_test, y_test):
+    ''' evaluate a model on y_test'''
+    y_preds = model.predict(X_test)
+    acc = model.score(X_test, y_test)
+    prec = precision_score(y_test, y_preds)
+    recall = recall_score(y_test, y_preds)
+    f1 = f1_score(y_test, y_preds)
+    dft_eval = {'accuracy' : acc,
+               'precision' : prec,
+                  'recall' : recall,
+                'f1 score' : f1}
+    for v, k in dft_eval.items():
+        print(v,': {:.2f}%'.format(k * 100))
+    return dft_eval
+</code>
+</pre>
+
+<pre class="prettyprint">
+<code class="language-python">
+  dft_eval = eval_mod(clf, Xn_test, y_test)
+<span class="nocode" style="color:white;">
+  >>>
+  	accuracy : 90.16%
+  	precision : 88.57%
+  	recall : 93.94%
+  	f1 score : 91.18%
+</code>
+</pre>
+<p>And using <code>cross_val_score()</code> to <em>Cross-validate</em> for a more accurate and solid results:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  def cv_eval_mod(model, X, y):
+      ''' evaluate a model on y_test'''
+      y_preds = model.predict(X_test)
+      cv_acc = np.mean(cross_val_score(model, X, y, scoring = "accuracy", cv = 5))
+      cv_prec = np.mean(cross_val_score(model, X, y, scoring = "precision", cv = 5))
+      cv_recall = np.mean(cross_val_score(model, X, y, scoring = "recall", cv = 5))
+      cv_f1 = np.mean(cross_val_score(model, X, y, scoring = "f1", cv = 5))
+      cv_eval = {'accuracy' : cv_acc,
+                'precision' : cv_prec,
+                'recall' : cv_recall,
+                'f1 score' : cv_f1 }
+      for v, k in cv_eval.items():
+          print(v,': {:.2f}%'.format(k * 100))
+      return cv_eval
+</code>
+</pre>
+<pre class="prettyprint">
+<code class="language-python">
+  cv_eval = cv_eval_mod(clf, Xn_test, y_test)
+<span class="nocode" style="color:white;">
+  >>>
+      accuracy : 77.18%
+      precision : 76.90%
+      recall : 84.76%
+      f1 score : 80.45%
+</code>
+</pre>
+We can observe our evaluation:
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio10.png" style="background-color:white;">
+</div>
+<h4>4. Feature importance</h4>
+
+<p>Finally, we will find which features were important in order to predict cardiovascular diseases using the medical examination results we had, or similarily: </p>
+<p><strong>Which charateristics contribute the most to logReg predicting whether someone has cadiovascular disease or not?</strong></p>
+
+
+<pre class="prettyprint">
+<code class="language-python">
+  #get the coefficients from logReg
+  clf.coef_
+
+  # Match features to columns of our df
+  features_dict = dict(zip(heart_df.columns, list(clf.coef_[0])))
+</code>
+</pre>
+
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio11.png" style="background-color:white;">
+</div>
+
+<p>Now, the final remark to make is that our model is learning and figuring out the pattern : <code>slope</code> increases  $\Rightarrow$  <code>target</code> $\longrightarrow$ positive.</p>
+
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio12.png" style="background-color:white;">
+</div>
+
+<p>Here, the data does suggest such a thing, although it seems kind of logical as well:</p>
+<ul>
+<li>Upsloping: better heart rate with excercise (uncommon)</li>
+<li>Flatsloping: minimal change (typical healthy heart)</li>
+<li>Downslopins: signs of unhealthy heart</li>
+</ul>
+
+<h4>5. Conclusion</h4>
+
+<p>We analysed our sample and trained a model that reached up to 90.16% on score
+  accuracy and 83.81% on cross-validated accuracy. As our model here is pretty much
+  balanced, we would want to aim for a higher <strong>accuracy</strong>, of at least
+  &gt; 95%. However, since false negative predictions are lower than the false positive
+  ones (confusion matrix) we do have a pretty high <strong>recall</strong> (91.52%
+  on cross-validation) which is good.</p>
+  <ul>
+    If you are interested in the codes I used, you can find everything in
+    <li>my Github repository : <i class="material-icons" href="https://github.com/Sithlord-dev/Cardiovascular_diagnosis">link</i></li>
+    <li>my Colab's notebook : <a href="https://colab.research.google.com/github/Sithlord-dev/Cardiovascular_diagnosis/blob/main/Cardiovascular_disease_classification.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+  </a></li>
+    </ul>
+    </div>
+ </div>
+</div>
+</div>
+</div>
+</div>

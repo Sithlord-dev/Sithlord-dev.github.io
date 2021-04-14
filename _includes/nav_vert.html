@@ -1,0 +1,91 @@
+<ul id="tabs-swipe-demo" class="tabs">
+    <li class="tab col s3"><a href="#da-tab">
+    <div class="collapsible-header"><i class="material-icons">analytics</i>Data Science</div>
+    </a></li>
+    <li class="tab col s3"><a class="active" href="#ml-tab">
+      <div class="collapsible-header"><i class="material-icons">smart_toy</i>Machine Learning</div>
+    </a></li>
+    <li class="tab col s3"><a  href="#fun-tab">
+      <div class="collapsible-header"><i class="material-icons">precision_manufacturing</i>Fun Projects</div>
+    </a></li>
+</ul>
+
+
+<div id="da-tab" class="col s12">
+      <!-- whatever inside first tab -->
+  <div class="card">
+    <div class="card-content">
+      <p>Here are some projects I made/worked on with a focus on data analysis and time-series.</p>
+    </div>
+  </div>
+<!-- you can nest another set of tab inside like so : -->
+    <ul id="tabs-swipe-demo" class="tabs">
+        <li class="tab col s3" ><a class="active" href="#da-1">Page view time-series visualizer</a></li>
+        <li class="tab col s3"><a  href="#da-2">Sea level prediction</a></li>
+    </ul>
+    <div id="da-1" class="col s12 teal lighten-3">
+        <span class="black-text">{% include data_science/pageview.html %}</span> <!-- whatever inside first tab -->
+    </div>
+    <div id="da-2" class="col s12 teal lighten-3">
+        <span class="black-text">{% include data_science/sealvl.html %}</span> <!-- whatever inside secont tab -->
+    </div>
+</div>
+
+<div id="ml-tab" class="col s12">
+  <!-- whatever inside first tab -->
+<div class="card">
+<div class="card-content">
+  <p>Here are some Machine learning projects I did/worked on myself, during my studies
+    and/or for learning/practice.</p>
+<ul>I worked with <b>TensorFlow</b>, <b>Keras</b>, as well as with <b>PyTorch</b>
+  and I am familiar with:
+    <li><b>Regression algorithms</b>: Linear regression, Logistic regression, ...</li>
+    <li><b>Computer vision</b></li>
+    <li><b>Natrual Language Processing</b></li>
+    <li><b>Data Minning</b></li>
+    <li><b>Deep learning</b>: CNN, RNN and LSTM</li>
+</ul>
+</div>
+</div>
+<!-- you can nest another set of tab inside like so : -->
+    <ul id="tabs-swipe-demo" class="tabs">
+        <li class="tab col s3"><a class="active" href="#ml-1">COVID19 fakenews detection </a></li>
+        <li class="tab col s3"><a href="#ml-2">Dog breed classification</a></li>
+        <li class="tab col s3"><a href="#ml-3">Book recommendation engine</a></li>
+        <li class="tab col s3"><a href="#ml-4">Cardiovascular disease classification</a></li>
+        <li class="tab col s3"><a href="#ml-5">Breast tumours Diagnostic</a></li>
+    </ul>
+    <div id="ml-1" class="col s12">
+        <span class="black-text">{% include ml/covid19_fakenews.html %}</span> <!-- whatever inside first tab -->
+    </div>
+    <div id="ml-2" class="col s12">
+        <span class="black-text">{% include ml/dog_vision.html %}</span> <!-- whatever inside secont tab -->
+    </div>
+    <div id="ml-3" class="col s12">
+        <span class="black-text">{% include ml/book_knn.html %}</span> <!-- whatever inside third tab -->
+    </div>
+    <div id="ml-4" class="col s12">
+        <span class="black-text">{% include ml/cardio.html %}</span> <!-- whatever inside first tab -->
+    </div>
+    <div id="ml-5" class="col s12">
+        <span class="black-text">{% include ml/breast_cancer.html %}</span> <!-- whatever inside first tab -->
+    </div>
+</div>
+
+<div id="fun-tab" class="col s12">
+  <!-- whatever inside first tab -->
+<div class="card">
+  <div class="card-content">
+    <p>Here are some project I did myself, for Uni and/or for pure fun and curiosity!
+      I also do have a random junk of codes, available here <i class="material-icons" href="https://repl.it/@Sithlorddev">developer_mode</i>
+    </p>
+  </div>
+</div>
+<!-- you can nest another set of tab inside like so : -->
+    <ul id="tabs-swipe-demo" class="tabs">
+        <li class="tab col s3" ><a class="active" href="#fun-1">Conway's "Game of life"</a></li>
+    </ul>
+    <div id="fun-1" class="col s12 pink darken-4">
+        <span class="black-text">{% include fun_proj/the_game_of_life.html %}</span> <!-- whatever inside first tab -->
+    </div>
+</div>

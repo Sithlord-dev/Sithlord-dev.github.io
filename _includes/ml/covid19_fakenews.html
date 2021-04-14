@@ -1,0 +1,579 @@
+<div class="container">
+
+<!-- Start of rows div -->
+<div class="row">
+
+  <div class="col s12 m13" style="padding-top: 30px; padding-right: 30px; padding-left: 30px;">
+   <div class="card z-depth-0" style="padding-top: 20px; padding-right: 10px; padding-left: 10px;">
+   <h3 class="center-align" style="padding-right: 20px; padding-left: 20px;"">COVID19 fakenews detection using Natural Language Processing</h3>
+   <p class="grey-text center-align">11th December 2020</p>
+     <div class="center-align">
+     <div class="chip">
+        Machine learning
+        </div>
+        <div class="chip">
+        Deep learning
+        </div>
+        <div class="chip">
+        python
+        </div>
+        <div class="chip">
+        NLP
+        </div>
+      </div>
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+    <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+      <IMG src="ml/covid19_fakenews/fakenews.jpg" class="materialboxed" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" data-caption="source: radiorebelde.cu">
+    </div>
+    <p>One of the shared tasks of CONSTRAINT 2021&#39;s first Workshop on Combating
+      Online Hostile Posts in Regional Languages during Emergency Si​tuation, was about
+      &quot;<em>Fighting an Infodemic: COVID-19 Fake News</em>&quot;. Here is my modest
+      participation at the Codalab&#39;s competition <a href="https://competitions.codalab.org/competitions/26655#learn_the_details">COVID19 Fake News Detection in English</a></p>
+
+  <div id="title1" style="margin-top:50px;">
+    <h4><a href="#title1"><i class="material-icons">code</i></a> Building a tweet classification algrithm using Logistic Regression</h4>
+  </div>
+  <p>The <a href="https://arxiv.org/abs/2011.03327">Fighting an Infodemic: COVID-19 Fake News Dataset</a>
+    contains tweets along with their associated binary labels: <code>real</code> f
+    or real/verified COVID19 related informations and <code>fake</code> for
+    hoaxes/fake news. </p>
+
+<p>To work through this taskn we follow the usual workflow:
+  <ul class="collection">
+  <li class="collection-item"><strong>Data analysis</strong> - We prepare, study and explore the dataset, highliting important correlations.</li>
+  <li class="collection-item"><strong>Model modelling</strong> - we create and train a model to predict a target variable, then we tune the hyper-parameters of our model in order to improve it if possible.</li>
+  <li class="collection-item"><strong>Model evaluation and comparison</strong> - we evaluate it using some metrics and compare them to find the best one.  </li>
+  <li class="collection-item"><strong>Model experimentation</strong> - we try to improve the model through experimentation.</li>
+  </ul> </p>
+
+  <p>Let's import the main modules and libraries we will be working with:</p>
+  <pre class="prettyprint">
+  <code class="language-python">
+    ## Data analysis libraries
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import collections
+
+    ## Scikit Learn Models:
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.naive_bayes import MultinomialNB
+    from sklearn.svm import LinearSVC
+    from xgboost import XGBClassifier
+
+    ## Feature extraction
+    from sklearn.base import BaseEstimator, TransformerMixin
+    from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+    from sklearn.feature_extraction import stop_words
+
+    ## text preprocessing
+    import nltk
+    from nltk.stem import PorterStemmer, WordNetLemmatizer
+    import re
+    import string
+    import emoji
+
+    ## Scikit Learn Model evaluators:
+    from sklearn.model_selection import train_test_split, cross_val_score, KFold
+    from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
+    from sklearn import metrics
+    from sklearn.metrics import confusion_matrix, classification_report, roc_curve
+    from sklearn.metrics import precision_score, recall_score, f1_score
+    from sklearn.pipeline import Pipeline, FeatureUnion
+  </code>
+  </pre>
+  <h4> 1. Data analysis: </h4>
+<p>We import our csv files:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  train_df = pd.read_csv('files/Constraint_English_Train - Sheet1.csv', index_col = 'id',)
+  val_df = pd.read_csv('files/Constraint_English_Val - Sheet1.csv', index_col = 'id')
+  test_df = pd.read_csv('files/english_test_with_labels - Sheet1.csv', index_col = 'id')
+</code>
+</pre>
+<p>The data consists of 8560with the labels <code>real</code> for real news and
+  <code>fake</code> for the fake ones:</p>
+  <table border="1" class="striped">
+    <thead>
+      <tr style="text-align: right;">
+        <th></th>
+        <th>tweet</th>
+        <th>label</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>0</th>
+        <td>Nancy Pelosi said, ???if you accept a check fr...</td>
+        <td>fake</td>
+      </tr>
+      <tr>
+        <th>1</th>
+        <td>RT @CDCHeart_Stroke: #HeartAttacks and #stroke...</td>
+        <td>real</td>
+      </tr>
+      <tr>
+        <th>2</th>
+        <td>The SARS-CoV-2 has been engineered by man edit...</td>
+        <td>fake</td>
+      </tr>
+      <tr>
+        <th>3</th>
+        <td>We expect to complete this by the end of the d...</td>
+        <td>real</td>
+      </tr>
+      <tr>
+        <th>4</th>
+        <td>RT @PIB_India: Cases per million population in...</td>
+        <td>real</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+      <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/label_dist.png" style="background-color:white;">
+  </div>
+<p>We will perform some statistical analysis on the dataset and get descriptive statistics in order to process our data:
+    count words :
+    <ul>
+      <li>number of words in the tweet:</li>
+      <pre class="prettyprint">
+  <code class="language-python">
+  count_words = main_df['tweet'].apply(lambda x: len(re.findall(r'\w+', x)))
+
+  main_df['count_words'] = count_words
+  </code>
+    </pre>
+    <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+        <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/words.png" style="background-color:white;">
+    </div>
+    <li>count mentions : referrals to other Twitter accounts, which are preceded by a `@`</li>
+    <pre class="prettyprint">
+<code class="language-python">
+  count_mentions = main_df['tweet'].apply(lambda x: len(re.findall(r'@\w+', x)))
+
+  main_df['count_mentions'] = count_mentions
+</code>
+  </pre>
+  <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+      <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/mentions.png" style="background-color:white;">
+  </div>
+  <li>count hashtags : number of tag words, preceded by a #</li>
+  <pre class="prettyprint">
+<code class="language-python">
+  count_hashtags = main_df['tweet'].apply(lambda x: len(re.findall(r'#\w+', x)))
+
+  main_df['count_hashtags'] = count_hashtags
+</code>
+</pre>
+<p>Most of the tweets do not contain hash tags, and the few that have tend to be real,
+maybe it can make a difference during training depending on if we get rid of it or
+not in text processing.</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/hash.png" style="background-color:white;">
+</div>
+<li>count capital words : number of uppercase words, could be used to somehow "shout
+  accusations" and "denounce conspiracy" </li>
+<pre class="prettyprint">
+<code class="language-python">
+  count_caps = main_df['tweet'].apply(lambda x: len(re.findall(r'\b[A-Z]{2,}\b', x)))
+
+  main_df['count_caps'] = count_caps
+</code>
+</pre>
+<p>Most of the tweets do not contain capitalized words and so it probably won't
+  have any effect if we lower() our texts.</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+  <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/caps.png" style="background-color:white;">
+</div>
+<li>count exclamation/question marks : number of question or exclamation marks</li>
+<pre class="prettyprint">
+<code class="language-python">
+  count_excl_quest_marks = main_df['tweet'].apply(lambda x: len(re.findall(r'!|\?', x)))
+
+  main_df['count_excl_quest_marks'] = count_excl_quest_marks
+</code>
+</pre>
+<p>The fake tweets seem to be using a bit more exclamation or question marks than
+  the real ones.</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+  <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/exc.png" style="background-color:white;">
+</div>
+<li>count URLs : number of links in the tweet, preceded by http(s), might be a
+  source that can be verified/denied.</li>
+<pre class="prettyprint">
+<code class="language-python">
+  count_urls = main_df['tweet'].apply(lambda x: len(re.findall(r'http.?://[^\s]+[\s]?', x)))
+
+  main_df['count_urls'] = count_urls
+</code>
+</pre>
+<p>It seems that more real tweets use URLS than fake ones, which seems a bit logical,
+  maybe taking into account the tweets with verifiable urls might help our classification.</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+  <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/urls.png" style="background-color:white;">
+</div>
+<li>And finally, we count the number of emojis in each tweet : (we use the module <code>emoji</code>)</li>
+<pre class="prettyprint">
+<code class="language-python">
+  count_emojis = main_df['tweet'].apply(lambda x: emoji.demojize(x)).apply(lambda x: len(re.findall(r':[a-z_&]+:', x)))
+
+  main_df['count_emojis'] = count_emojis
+</code>
+</pre>
+<p>We can see that quasi all the tweets do not use emojis, hence it would not make
+  that much of a difference to leave them.</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+  <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/emojis.png" style="background-color:white;">
+</div>
+    </ul>
+</p>
+<h4>2. Data moddeling</h4>
+<p>Here we will try to build a model and train in order to predict our <code>label</code> variable:</p>
+<h5>2.1. text processing:</h5>
+<p>We first convert the class labels into binary numerical variables for convenience:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  main_df['label'] = main_df.label.map({'real':1, 'fake':0})
+</code>
+</pre>
+<p>We write a function that would clean and preprocess our tweets in order to feed it
+to our model:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  stopwords = stop_words.ENGLISH_STOP_WORDS
+
+  def clean(text):
+
+    """ Takes a string of text and preprocess it, by removing hashtapgs, punctuations, numbers and tokenizing"""
+  # text = re.sub(r'@\w+', '', text) # remove mentions
+    text = text.replace("#", "") # remove the hashtag character
+    text = text.replace("RT", "") # remove the retweet mention
+    text = text.lower() # lowercase
+    text = "".join([char for char in text if char not in string.punctuation and not char.isdigit()]) #remove punctuation and numbers
+    text = " ".join([token for token in text.split() if token not in stopwords])
+  # porter = PorterStemmer()
+  # text = " ".join([porter.stem(word) for word in text.split()]) #stemming #it actually works better without
+
+    return text
+</code>
+</pre>
+<p>Here is an example of how the clean functions works, applied to one of my favourite
+  tweetter accounts:</p>
+  <pre class="prettyprint">
+  <code class="language-python">
+  text = '@KyloR3n hello @hottopic i want a shirt that says I’m a different person but it should be the same color and basically the same shirt'
+
+  clean(text)
+  <span class="nocode" style="color:white;">
+  >>>
+      hello want shirt say i’m differ person color basic shirt
+  </code>
+  </pre>
+<p>Finally, we regroup everything together:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  clean_tweet = main_df['tweet'].apply(clean)
+  main_df['clean_tweet'] = clean_tweet
+  main_df = main_df.drop(['tweet'], axis = 1)
+<span class="nocode" style="color:white;">
+</code>
+</pre>
+<p>We can also see the distribution of the words per frequency in all the tweets</p>
+<pre class="prettyprint">
+<code class="language-python">
+  vect = CountVectorizer()
+  bag = vect.fit_transform(clean_tweet)
+  word_freq = dict(zip(vect.get_feature_names(), np.asarray(bag.sum(axis=0)).ravel()))
+  word_count = collections.Counter(word_freq)
+  word_count_df = pd.DataFrame(word_count.most_common(20), columns = ['word', 'frequency'])
+<span class="nocode" style="color:white;">
+</code>
+</pre>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+  <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/dist_words.png" style="background-color:white;">
+</div>
+<h4>Data modelling</h4>
+<p>Our model is about <strong>classification</strong>, where we are predicting a <strong>categorical variable</strong> : <code>label</code>. It has <strong>labeled data</strong> of less than 100.000 samples. Using Scikit Learn&#39;s <a href="https://scikit-learn.org/stable/user_guide.html">documentation</a> we opt for the following models:</p>
+<ul>
+<li>Log Reg : <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html">LogisticRegression</a></li>
+<li>MultinomialNB : <a href="https://scikit-learn.org/stable/modules/naive_bayes.html">Naive Bayes</a></li>
+<li>Linear SVC : <a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC">Support Vector Classification</a></li>
+<li>XGBoost : <a href="https://xgboost.ai/">XGBoost</a>.</li>
+</ul>
+<pre class="prettyprint">
+<code class="language-python">
+  X_train, X_val, y_train, y_val = train_test_split(main_df.drop(['label'], axis=1), main_df.label, test_size=0.2, random_state=1729)
+<span class="nocode" style="color:white;">
+</code>
+</pre>
+<p>In order to see which model performs the best, we proceed as follow: We instantiate
+each model in a dictionary </p>
+<pre class="prettyprint">
+<code class="language-python">
+  models = {'logReg': LogisticRegression(max_iter = 1000),
+            'MultiNB': MultinomialNB(),
+            'lSVC': LinearSVC(class_weight='balanced'),
+            'XGB': XGBClassifier(use_label_encoder=False)}<span class="nocode" style="color:white;">
+</code>
+</pre>
+<p>we create function to preprocess, vectorize the training and validation data, fits and scores models</p>
+<pre class="prettyprint">
+<code class="language-python">
+  def mod_score(models, X_train, X_test, y_train, y_test, vect=CountVectorizer()):
+    '''
+    Takes a dictionarry of models and fits each on a training set and returns its score on a test set
+    '''
+    # empty dict to append
+    results = {}
+    # ffeature extraction:
+    X_train_vect = vect.fit_transform(X_train.clean_tweet)
+    #transform testing data (using training data's features)
+    X_test_vect = vect.transform(X_test.clean_tweet)
+    for name, model in models.items() :
+        model.fit(X_train_vect, y_train)
+        results[name] = model.score(X_test_vect, y_test)
+
+    return results
+</code>
+</pre>
+and we observe the results:
+<pre class="prettyprint">
+<code class="language-python">
+  mod_score(models, X_train, X_val, y_train, y_val)
+</code>
+</pre>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+  <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/mod_perf.png" style="background-color:white;">
+</div>
+<p>SVM's linear SVC and LogisticRegression both achieved an acuuracy of 92%! thats sounds great.</p>
+<h4>4. Hyper-parameters tuning</h4>
+<p>This is somehow, the most expensive, time and ressources consuming step of the workflow.
+  As the vectorizers and the classification models have both tuneable parameters, and due to
+  the small size of our sample (8650 tweets only) we use <code>GridSearchCV</code> to select
+  the best parameters on a 5-fold cross-validation.</p>
+<p>We use the following grid parameters:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  ## Vectorizers hyperparameters:
+  # BOW hyperparameters
+  vect_grid = {'features__pipe__vect__max_df': (0.25, 0.5, 0.75),
+               'features__pipe__vect__min_df': (1,2) }
+  # TF-IDF hyperparaleters
+  tfidf_grid = {'features__pipe__vect__analyzer' : ('word', 'char'),
+                'features__pipe__vect__ngram_range': ((1, 3), (3, 7), (5, 7), (2, 2), (1, 2)),
+                'features__pipe__vect__binary' : (True, False) }
+
+  ## Classifiers hyperparameters:
+  # logReg hyperparameters
+  logReg_grid = {'model__C': (0.001, 0.01, 0.1, 1, 10, 100, 1000),
+                 'model__solver': ['lbfgs', 'liblinear'],
+                 'model__penalty' : ('l1', 'l2')}
+
+  # MultionomialNB hyperparameters
+  MultiNB_grid = {'model__alpha': (0.25, 0.5, 0.75)}
+
+  # SVC hyperparameters
+  lSVC_grid = {'model__C': (.05, .12, .25, .5, 1, 2, 4)}
+</code>
+</pre>
+<p>We will use two vectorizing methods : the <em>bag of words</em> vectorizer : <a href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html">CountVectorizer</a> : <mark style="background-color: #e4e6e8"><code>vect=CountVectorizer()</code></mark>
+and the Term Frequency - Inverse Document Frequency : <a href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html">TF - IDF</a>
+<mark style="background-color: #e4e6e8"><code>vect=TfidfVectorizer()</code></mark> </p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+  <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/mod_perf_plot.png" style="background-color:white;">
+</div>
+<table border="1" class="striped">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>accuracy_Cvect</th>
+      <th>accuracy_TF-IDF</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>logReg</th>
+      <td>93.049%</td>
+      <td>94.217%</td>
+    </tr>
+    <tr>
+      <th>lSVC</th>
+      <td>93.166%</td>
+      <td>94.042%</td>
+    </tr>
+    <tr>
+      <th>MultiNB</th>
+      <td>93.283%</td>
+      <td>91.998%</td>
+    </tr>
+    <tr>
+      <th>XGB</th>
+      <td>88.084%</td>
+      <td>87.266%</td>
+    </tr>
+  </tbody>
+</table>
+<p>We clearly see that the best results were achived by the following parametrization: </p>
+<pre class="prettyprint">
+<code class="language-python">
+  tfidf_cstm_lorReg = TfidfVectorizer(binary=True, max_df=0.5, min_df=1, ngram_range=(1, 2))
+  logReg_tfidf_cstm = LogisticRegression(max_iter = 1000, C=1000, penalty='l2', solver='liblinear')
+</code>
+</pre>
+<h4>Model evaluation</h4>
+<p>Now that we saw a slight improvement in our model's performance, we can evaluate
+  it on the testing Dataset: We first prepare our testing dataset</p>
+  <pre class="prettyprint">
+<code class="language-python">
+  test_df = test_df.reset_index().drop('id', axis=1)
+  test_df['label'] = test_df.label.map({'real':1, 'fake':0})
+  test_df['clean_tweet'] = test_df['tweet'].apply(clean)
+  test_df = test_df.drop(['tweet'], axis = 1)
+</code>
+  </pre>
+<p>and we evaluate our model on the test data:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  X_train, X_test, y_train, y_test = main_df.drop(['label'], axis=1), test_df.drop(['label'], axis=1), main_df.label, test_df.label
+
+  # Preprocess and Vectorize the data:
+  X_train_tfidfv = tfidf_cstm_lorReg.fit_transform(X_train.clean_tweet)
+  X_test_tfidfv = tfidf_cstm_lorReg.transform(X_test.clean_tweet)
+
+  # Instantiate best model with best hyperparameters
+  history = logReg_tfidf_cstm.fit(X_train_tfidfv, y_train)
+
+  # Make predictions
+  y_preds = history.predict(X_test_tfidfv)
+</code>
+</pre>
+<h5>3.1. Confusion matrix:</h5>
+<p>We can have a visual idea on how our model's performance is, by looking at where
+  the model nailed its predictions and where it failed:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  conf_mtrx = confusion_matrix(y_test, y_preds)
+</code>
+</pre>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+  <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/conf_mtrx.png" style="background-color:white;">
+</div>
+<h5>3.2. ROC Curve and AUC Scores:</h5>
+<p>We can also compare the TPR to the FPR, i.e tweet that is flagged real, but is
+  fake vs a tweet that is flagged fake although it is real:</p>
+  <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/covid19_fakenews/roc.png" style="background-color:white;">
+  </div>
+<h5>3.3. Classification report:</h5>
+<p>and finally, we have a look at the main evaluation metrics:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  # Create a classification report using the classification_report function
+  report = classification_report(y_test, y_preds, output_dict=True)
+
+  pd.DataFrame(report).T
+</code>
+</pre>
+<table border="1" class="striped">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>precision</th>
+      <th>recall</th>
+      <th>f1-score</th>
+      <th>support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.939303</td>
+      <td>0.925490</td>
+      <td>0.932346</td>
+      <td>1020.000000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.933040</td>
+      <td>0.945536</td>
+      <td>0.939246</td>
+      <td>1120.000000</td>
+    </tr>
+    <tr>
+      <th>accuracy</th>
+      <td>0.935981</td>
+      <td>0.935981</td>
+      <td>0.935981</td>
+      <td>0.935981</td>
+    </tr>
+    <tr>
+      <th>macro avg</th>
+      <td>0.936172</td>
+      <td>0.935513</td>
+      <td>0.935796</td>
+      <td>2140.000000</td>
+    </tr>
+    <tr>
+      <th>weighted avg</th>
+      <td>0.936025</td>
+      <td>0.935981</td>
+      <td>0.935957</td>
+      <td>2140.000000</td>
+    </tr>
+  </tbody>
+</table>
+<h4>Conclusion</h4>
+<p>We have reached a nice result, an accuracy of around more than 93% a recall of around 94%.
+We can manually try our model out, with some random made up tweets and see how it performs :
+here are some random tweets i found following the hashtag #COVID </p>
+<pre class="prettyprint">
+<code class="language-python">
+  tweet1 = """The charity @TEDSliverpool says money raised in memory of Claudia Walsh
+  means it'll be able to help more people with mental health issuesClaudia died with
+  #coronoavirus on her 25th birthday. She also volunteered at @WhitechapelLiv. More
+  than £21,000 has already been raised"""
+
+  tweet2 = """Canadian-made SARS-CoV-2 detector set to ship worldwide | $KNR $KNR.ca
+  #biocloud #smartbuildings #smartfactory #kontrol #smartcity #smartcities  #ontario
+  #canada #safespaces #madeincanada #innovation #ai #iot #covid19 #covidー19 #sarscov2
+  #coronoavirus https://bit.ly/3mXWV2O"""
+
+  tweet3 = """#Coronoavirus : "Indigenous people are stepping up as volunteer firefighters,
+  but they are now doubly strained: Closed borders have shriveled their income from sustainably
+  harvested forest exports" @ACOFOP #Guatemala @alianzabosques https://apnews.com/e3cddd53e453a2"""
+
+  tweet4 = """Masih Alinejad says Government hid news of #coronoavirus for political purposes"""
+</code>
+  </pre>
+  and we can test our model and predict the veracity of the tweets:
+  <pre class="prettyprint">
+  <code class="language-python">
+    # Make predictions
+  y_preds = ['real' if v == 1 else 'fake' for v in history.predict(vect).tolist() ]
+
+  y_preds
+  >>>
+      ['fake', 'real', 'fake', 'fake']
+  </code>
+    </pre>
+    <h4>Further developpement</h4>
+    <p>Maybe try Deep Learning? a CNN using Words Embeddings with LogReg's feature extractions... or roBert/daBert? Ernie2.0?</p>
+
+<ul>
+  If you are interested in the codes I used, you can find everything in
+  <li>my Github repository : <i class="material-icons" href="https://github.com/Sithlord-dev/COVID19_fakenews_detection ">link</i></li>
+  <li>my Colab's notebook : <a href="https://colab.research.google.com/github/Sithlord-dev/COVID19_fakenews_detection/blob/main/Covid19_fakenews_detection_using_NLP.ipynb">
+<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a></li>
+  </ul>
+    </div>
+ </div>
+</div>
+</div>
+</div>
+</div>

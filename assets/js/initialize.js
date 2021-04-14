@@ -77,16 +77,16 @@ function initializeScripts(){
     });
 
   var urlString = window.location.href;
-  
+
   $(document).scrollTop();
 
   var pagename = window.location.pathname.replace('/', '')
-  
+
   if(window.ga) {
     window.ga('set', 'page', window.location.pathname);
     window.ga('send', 'pageview');
   }
-  
+
   if(pagename === ''){
     Barba.Pjax.getTransition = () => HideShowTransition;
   } else {
@@ -117,6 +117,10 @@ function initializeScripts(){
       showProjects(projects, active_tags);
     }
   })
+
+  $(document).ready(function(){
+    $('.slider').slider();
+  });
 
   $("nav ul li a").hover(function(e){
     $(e.target).parent().find('div').addClass('nav-hover-underlined');

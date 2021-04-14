@@ -1,0 +1,173 @@
+<div class="container">
+
+<!-- Start of rows div -->
+<div class="row">
+
+  <div class="col s12 m13" style="padding-top: 30px; padding-right: 30px; padding-left: 30px;">
+   <div class="card z-depth-0" style="padding-top: 20px; padding-right: 10px; padding-left: 10px;">
+   <h3 class="center-align" style="padding-right: 20px; padding-left: 20px;"">Building a forum Page view time-series visualizer with Python and pandas</h3>
+     <div class="center-align">
+     <div class="chip">
+        Data Anlaysis
+        </div>
+        <div class="chip">
+        Time series
+        </div>
+        <div class="chip">
+        python
+        </div>
+        <div class="chip">
+        pandas
+        </div>
+      </div>
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+
+      <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+        <IMG src="da/pageview/forum.jpg" style="display: block; margin-left: auto; margin-right: auto; width: 100%;">
+      </div>
+    <!-- put h tag in div give div an id and link # with that id to jump directly-->
+    <div id="title1" style="margin-top:50px;">
+      <h4><a href="#title1"><i class="material-icons">code</i></a> Page view time-series visualizer</h4>
+    </div>
+    <p>For this project we visualize time series data using a line chart, bar chart,
+      and box plots to understand the patterns in visits and identify yearly and
+      monthly growth.</p>
+    <p>To work through this task, we will use
+      <mark style="background-color: #e4e6e8"><code>pands</code></mark>, <mark style="background-color: #e4e6e8"><code>matplotlib</code></mark> and
+      <mark style="background-color: #e4e6e8"><code>seaborn</code></mark> to visualize
+      a dataset containing the number of page views each day on the <a href="https://forum.freecodecamp.org">FreeCodeCamp</a>'s
+      forum from 2016-05-09 to 2019-12-03</p>
+    <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+      <IMG src="da/pageview/fcc_forum.jpg" style="display: block; margin-left: auto; margin-right: auto; width: 100%;">
+    </div>
+  <p>Let's import the main modules and libraries we will be working with:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  import matplotlib.pyplot as plt
+  import pandas as pd
+  import seaborn as sns
+</code>
+</pre>
+<h4>1. Reading and cleaning the data</h4>
+<p>We read ours CSV file</p>
+
+<pre class="prettyprint">
+<code class="language-python">
+  df = pd.read_csv('files/forum-pageviews.csv',
+                 header = 0,
+                 names=['Date', 'Views'],
+                 parse_dates=['Date'],
+                 index_col='Date')
+</code>
+</pre>
+<p>and make sure to filter out days when the page views were in the top 2.5% of
+  the dataset or bottom 2.5% of the dataset.</p>
+<pre class="prettyprint">
+<code class="language-python">
+  mask = (df['Views'] >= df['Views'].quantile(0.025)) & (df['Views'] <= df['Views'].quantile(0.975))
+  df_cln = df[mask]
+</code>
+</pre>
+<table border="1" class="striped">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Views</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2016-05-19</th>
+      <td>19736</td>
+    </tr>
+    <tr>
+      <th>2016-05-26</th>
+      <td>18060</td>
+    </tr>
+    <tr>
+      <th>2016-05-27</th>
+      <td>19997</td>
+    </tr>
+    <tr>
+      <th>2016-05-28</th>
+      <td>19044</td>
+    </tr>
+    <tr>
+      <th>2016-05-29</th>
+      <td>20325</td>
+    </tr>
+  </tbody>
+</table>
+<h4>2. Plotting results</h4>
+<h5>2.1 Daily views line plot:</h5>
+
+<p>We draw a line chart representing daily page views on the freeCodeCamp Forum
+  from May 2016 to December 2019:</p>
+
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="da/pageview/DA1.png" style="background-color:white;">
+</div>
+
+<h5>2.2 Monthly bar plot:</h5>
+<p>We copy and modify data for monthly bar plot:</p>
+
+<pre class="prettyprint">
+<code class="language-python">
+  df_bar = df_cln.copy()
+  df_bar['Month'] = df_bar.index.month_name()
+  df_bar['Year'] = df_bar.index.year
+  df_bar['month_index'] = df_bar.index.month
+  df_bar = df_bar.sort_values(by='month_index')
+</code>
+</pre>
+
+<p>And draw a bar plot using  <code>Seaborn</code> that shows the average daily page views for each month grouped by year:</p>
+
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="da/pageview/DA2.png" style="background-color:white;">
+</div>
+
+<h5>2.3 Year/Month-wise box plot:</h5>
+<p>We first sort and prepare data for box plots:</p>
+
+<pre class="prettyprint">
+<code class="language-python">
+  df_box = df_bar.copy()
+  df_box['Month'] = df_bar.index.month_name().str.slice(stop=3)
+</code>
+</pre>
+
+<p><em>Then</em>, we draw a box plot that shows how the values compare over time and how they are distributed within a given year: </p>
+
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="da/pageview/DA3.png" style="background-color:white;">
+</div>
+
+<p>or month:</p>
+
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="da/pageview/DA4.png" style="background-color:white;">
+</div>
+<p>Here is the full code as a function :</p>
+<iframe frameborder="0" width="100%" height="500px" src="https://replit.com/@Sithlorddev/Pageviewtimeseriesvisualizer?lite=true"></iframe>
+<ul>
+  If you are interested in the codes I used/wrote, you can find everything in
+  <li>my Github repository : <i class="material-icons" href="https://github.com/Sithlord-dev/Pageview_timeseries_visualizer">link</i></li>
+  <li>my Colab's notebook : <a href="https://colab.research.google.com/github/Sithlord-dev/Sithlord-dev/Pageview_timeseries_visualizer/blob/main/Page%20view%20time-series%20visualizer.ipynb">
+<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a></li>
+  </ul>
+    </div>
+ </div>
+</div>
+</div>
+</div>
+</div>

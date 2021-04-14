@@ -1,0 +1,560 @@
+<div class="container">
+
+<!-- Start of rows div -->
+<div class="row">
+
+  <div class="col s12 m13" style="padding-top: 30px; padding-right: 30px; padding-left: 30px;">
+   <div class="card z-depth-0" style="padding-top: 20px; padding-right: 10px; padding-left: 10px;">
+   <h3 class="center-align" style="padding-right: 20px; padding-left: 20px;"">Building a book recommendation engine using Collaborative Filtering</h3>
+   <p class="grey-text center-align">20th April 2020</p>
+     <div class="center-align">
+     <div class="chip">
+        Recommendation engine
+        </div>
+        <div class="chip">
+        Collaborative Filtering
+        </div>
+        <div class="chip">
+        Machine learning
+        </div>
+        <div class="chip">
+        python
+        </div>
+      </div>
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+    <p>We use Collaborative Filtering to make our recommendations out based other
+      user's similar preferences. We will use a machine learning algorithm known as the
+      NearestNeighbors to produce book recommendations that
+      are similar (based on user's ratings) to a given book.</p>
+
+    <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+      <IMG src="ml/book_knn/book.jpg" style="display: block; margin-left: auto; margin-right: auto; width: 100%;">
+    </div>
+
+    <p>We use the <a href="http://www2.informatik.uni-freiburg.de/~cziegler/BX/">Book-Crossings dataset</a> which contains 1.1 million ratings (scale of 1-10) of 270,000 books by 90,000 users.</p>
+
+
+    <div id="title1" style="margin-top:50px;">
+      <h4><a href="#title1"><i class="material-icons">code</i></a> Collaborative Filtering with KNN </h4>
+    </div>
+    <p>We will create a book recommendation algorithm using Scikit learn&#39;s <a href="https://scikit-learn.org/stable/modules/neighbors.html">K-Nearest Neighbors</a>.
+      Here is a short summary of what we will be doing:</p>
+    <ul class="collection">
+    <li class="collection-item"><strong>Data analysis</strong> - We prepare, study and explore the dataset, highliting important correlations.</li>
+    <li class="collection-item"><strong>Model modelling</strong> - we create and train a model to predict a target variable, then we tune the hyper-parameters of our model in order to improve it if possible.</li>
+    <li class="collection-item"><strong>Model evaluation and comparison</strong> - we evaluate it using some metrics and compare them to find the best one.  </li>
+    <li class="collection-item"><strong>Model experimentation</strong> - we try to improve the model through experimentation.</li>
+    </ul>
+    <p>Let's import the main modules and libraries we will be working with:</p>
+    <pre class="prettyprint">
+<code class="language-python">
+  ## Data analysis libraries
+  import numpy as np
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  from scipy.stats import linregress, norm
+  from scipy.sparse import csr_matrix
+
+  ## Scikit Learn Models:
+  from sklearn.neighbors import NearestNeighbors
+  from sklearn.decomposition import TruncatedSVD
+
+  ## String metrics
+  import Levenshtein as lev
+</code>
+    </pre>
+<h4> 1. Data analysis: </h4>
+<p>We read our files using using <mark style="background-color: #e4e6e8"><code>pandas</code></mark> :</p>
+<pre class="prettyprint">
+<code class="language-python">
+  df_books = pd.read_csv('BX-Books.csv',
+                         encoding = "ISO-8859-1",
+                         sep=";",
+                         header=0,
+                         names=['isbn', 'title', 'author'],
+                         usecols=['isbn', 'title', 'author'],
+                         dtype={'isbn': 'str', 'title': 'str', 'author': 'str'})
+
+  df_ratings = pd.read_csv('BX-Book-Ratings.csv',
+                           encoding = "ISO-8859-1",
+                           sep=";",
+                           header=0,
+                           names=['user', 'isbn', 'rating'],
+                           usecols=['user', 'isbn', 'rating'],
+                           dtype={'user': 'int32', 'isbn': 'str', 'rating': 'float32'})
+
+  df_users = pd.read_csv('BX-Users.csv',
+                           encoding = "ISO-8859-1",
+                           sep=";",
+                           header=0,
+                           names=['user', 'location', 'age'],
+                           usecols=['user', 'location', 'age'])
+</code>
+</pre>
+<p>As our recommendation engine is based on user's ratings, we can start by gathering
+some information about users, say we have a look at the age distribution: We observe
+that mMost of the active users are between 20 and 30. </p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/book_knn/age_dist.png" style="background-color:white;">
+</div>
+<p> and that most of the ratings are 0: </p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/book_knn/rate_dist.png" style="background-color:white;">
+</div>
+<p>We can see the TOP 5 rated books:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  df_ratings_books = pd.merge(df_ratings, df_books, on='isbn')
+
+  df_ratings_books.sort_values('rating', ascending=False).head(5)
+</code>
+</pre>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>user</th>
+      <th>isbn</th>
+      <th>rating</th>
+      <th>title</th>
+      <th>author</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>68283</th>
+      <td>273906</td>
+      <td>3596200261</td>
+      <td>10.0</td>
+      <td>Fischer TaschenbÃ?Â¼cher, Bd.26, SchÃ?Â¶ne neu...</td>
+      <td>Aldous Huxley</td>
+    </tr>
+    <tr>
+      <th>108227</th>
+      <td>211152</td>
+      <td>0743203631</td>
+      <td>10.0</td>
+      <td>Gap Creek: The Story Of A Marriage</td>
+      <td>Robert Morgan</td>
+    </tr>
+    <tr>
+      <th>619156</th>
+      <td>240144</td>
+      <td>0345276469</td>
+      <td>10.0</td>
+      <td>Agatha Christie: An Autobiography</td>
+      <td>Agatha Christie</td>
+    </tr>
+    <tr>
+      <th>925376</th>
+      <td>144194</td>
+      <td>0446517283</td>
+      <td>10.0</td>
+      <td>The Dragon King (Crimson Shadow/R.a. Salvatore)</td>
+      <td>R. A. Salvatore</td>
+    </tr>
+    <tr>
+      <th>709904</th>
+      <td>200300</td>
+      <td>0525946500</td>
+      <td>10.0</td>
+      <td>Charleston</td>
+      <td>John Jakes</td>
+    </tr>
+  </tbody>
+</table>
+<p>The ratings are very much unevenly distributed: There are books that are VERY much
+  rated, while some have almost no ratings.</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/book_knn/uneven_dist.png" style="background-color:white;">
+</div>
+<p>One also sees that, some users tend to leave a lot of reviews, while some very few.
+Let's see the 5 most rated books:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  most_rated_books = num_book_ratings.sort_values('rating', ascending=False)
+  most_rated_books_preview = pd.merge(most_rated_books, df_books, on='isbn').drop('user', axis=1)
+
+  most_rated_books_preview.head(5)
+</code>
+</pre>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn</th>
+      <th>rating</th>
+      <th>title</th>
+      <th>author</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0971880107</td>
+      <td>2502</td>
+      <td>Wild Animus</td>
+      <td>Rich Shapero</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0316666343</td>
+      <td>1295</td>
+      <td>The Lovely Bones: A Novel</td>
+      <td>Alice Sebold</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0385504209</td>
+      <td>883</td>
+      <td>The Da Vinci Code</td>
+      <td>Dan Brown</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0060928336</td>
+      <td>732</td>
+      <td>Divine Secrets of the Ya-Ya Sisterhood: A Novel</td>
+      <td>Rebecca Wells</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0312195516</td>
+      <td>723</td>
+      <td>The Red Tent (Bestselling Backlist)</td>
+      <td>Anita Diamant</td>
+    </tr>
+  </tbody>
+</table>
+<p>For a higher statistical significance, we choose to ommit the users with less
+  than 200 ratings, and books with less than 100 ratings:</p>
+  <pre class="prettyprint">
+<code class="language-python">
+  ratings = df_ratings
+
+  #remove users that have given less than 200 ratings
+  users_count = ratings['user'].value_counts()
+  ratings = ratings[~ratings['user'].isin(users_count[users_count < 200].index)]
+
+  #remove books that have been rated less than 100 times.
+  books_count = ratings['rating'].value_counts()
+  ratings = ratings[~ratings['isbn'].isin(books_count[books_count < 100].index)]
+</code>
+  </pre>
+<p>It turns out that the most rated book has one of the lowest rating average:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  num_book_ratings['average rating'] = df_ratings.groupby('isbn')['rating'].mean()
+
+  pd.merge(num_book_ratings, df_books[['title', 'isbn']], on='isbn').sort_values('rating', ascending=False).head()
+</code>
+</pre>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>isbn</th>
+      <th>user</th>
+      <th>rating</th>
+      <th>average rating</th>
+      <th>title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>215968</th>
+      <td>0971880107</td>
+      <td>2502</td>
+      <td>2502</td>
+      <td>1.019584</td>
+      <td>Wild Animus</td>
+    </tr>
+    <tr>
+      <th>38572</th>
+      <td>0316666343</td>
+      <td>1295</td>
+      <td>1295</td>
+      <td>4.468726</td>
+      <td>The Lovely Bones: A Novel</td>
+    </tr>
+    <tr>
+      <th>70803</th>
+      <td>0385504209</td>
+      <td>883</td>
+      <td>883</td>
+      <td>4.652322</td>
+      <td>The Da Vinci Code</td>
+    </tr>
+    <tr>
+      <th>7345</th>
+      <td>0060928336</td>
+      <td>732</td>
+      <td>732</td>
+      <td>3.448087</td>
+      <td>Divine Secrets of the Ya-Ya Sisterhood: A Novel</td>
+    </tr>
+    <tr>
+      <th>32372</th>
+      <td>0312195516</td>
+      <td>723</td>
+      <td>723</td>
+      <td>4.334716</td>
+      <td>The Red Tent (Bestselling Backlist)</td>
+    </tr>
+  </tbody>
+</table>
+
+  <p>This makes sense somehow, people tend to rate a lot or books they love, or books
+  they hate.</p>
+
+<h5>Correlation analysis:</h5>
+<p>We use bivariate correlation or PCC (<a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient">Pearson&#39;s correlation coefficients</a>)
+  in order to calculate the (linear) correlation between two ratings:</p>
+  <pre class="prettyprint">
+<code class="language-python">
+  # pivot ratings into matrix style
+  df_ratings_mtrx = ratings.pivot(index='user', columns='isbn', values='rating')
+</code>
+  </pre>
+  <p>As someone who has read <em>The Da Vinci Code</em> (with <code>isbn = 0385504209</code>), let&#39;s try and see corrolated results that Aearson&#39;s coefficient suggests:</p>
+  <pre class="prettyprint">
+<code class="language-python">
+davinci_corr = pd.DataFrame(df_ratings_mtrx.corrwith(df_ratings_mtrx['0385504209'], method='pearson'), columns=['pearson coeff']).dropna()
+</code>
+  </pre>
+  <p>We can observe the top 10 suggestions whose ratings are highly corrolated to the ones of the <em>Da Vinci Code</em> :</p>
+  <table border="1" class="dataframe">
+    <thead>
+      <tr style="text-align: right;">
+        <th></th>
+        <th>isbn</th>
+        <th>pearson coeff</th>
+        <th>rating</th>
+        <th>average rating</th>
+        <th>title</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>7</th>
+        <td>0385504209</td>
+        <td>1.000000</td>
+        <td>883</td>
+        <td>4.652322</td>
+        <td>The Da Vinci Code</td>
+      </tr>
+      <tr>
+        <th>15</th>
+        <td>0671027360</td>
+        <td>0.218741</td>
+        <td>586</td>
+        <td>3.718430</td>
+        <td>Angels &amp;amp; Demons</td>
+      </tr>
+      <tr>
+        <th>6</th>
+        <td>0375727345</td>
+        <td>0.214953</td>
+        <td>552</td>
+        <td>3.039855</td>
+        <td>House of Sand and Fog</td>
+      </tr>
+      <tr>
+        <th>1</th>
+        <td>0142001740</td>
+        <td>0.186145</td>
+        <td>615</td>
+        <td>4.219512</td>
+        <td>The Secret Life of Bees</td>
+      </tr>
+      <tr>
+        <th>16</th>
+        <td>067976402X</td>
+        <td>0.179512</td>
+        <td>614</td>
+        <td>3.255700</td>
+        <td>Snow Falling on Cedars</td>
+      </tr>
+      <tr>
+        <th>14</th>
+        <td>059035342X</td>
+        <td>0.166290</td>
+        <td>571</td>
+        <td>4.900175</td>
+        <td>Harry Potter and the Sorcerer's Stone (Harry P...</td>
+      </tr>
+      <tr>
+        <th>5</th>
+        <td>0345337662</td>
+        <td>0.149289</td>
+        <td>506</td>
+        <td>3.535573</td>
+        <td>Interview with the Vampire</td>
+      </tr>
+      <tr>
+        <th>4</th>
+        <td>0316666343</td>
+        <td>0.143711</td>
+        <td>1295</td>
+        <td>4.468726</td>
+        <td>The Lovely Bones: A Novel</td>
+      </tr>
+      <tr>
+        <th>12</th>
+        <td>0446672211</td>
+        <td>0.135783</td>
+        <td>585</td>
+        <td>4.105983</td>
+        <td>Where the Heart Is (Oprah's Book Club (Paperba...</td>
+      </tr>
+      <tr>
+        <th>3</th>
+        <td>0316601950</td>
+        <td>0.133880</td>
+        <td>568</td>
+        <td>3.593310</td>
+        <td>The Pilot's Wife : A Novel</td>
+      </tr>
+    </tbody>
+  </table>
+
+<p>This suggests that the correlation does work indeed, as we have a first suggestion
+  that is from the same author, and the fours others are all Mystery/Thrillers genre.</p>
+<h4>Data modelling</h4>
+<p>We convert our DataFrame into a <code>scipy</code> <a href="https://en.wikipedia.org/wiki/Sparse_matrix#Symmetric">sparse matrix</a>
+  and fill the missing values with zeros (since we actually will calculate distances between rating vectors)</p>
+  <pre class="prettyprint">
+<code class="language-python">
+  df_ratings_books = pd.merge(ratings, df_books, on='isbn').dropna(axis = 0, subset = ['title']).drop_duplicates(['user', 'title'])
+  df_ratings_books_mtrx = df_ratings_books.pivot(index = 'title', columns = 'user', values = 'rating').fillna(0)
+
+  # convert dataframe to scipy sparse matrix for more efficient calculations
+  ratings_mtrx = csr_matrix(df_ratings_books_mtrx.values)
+</code>
+  </pre>
+<p>We use the k-nearest neighbors algorithm from `KNN`: We choose the <mark style="background-color: #e4e6e8"><code>metric=cosine</code></mark>
+  to calculate thr cosine similarity between rating vectors</p>
+  <pre class="prettyprint">
+<code class="language-python">
+  history = NearestNeighbors(algorithm='brute',
+                          leaf_size=30,
+                          metric='cosine',
+                          metric_params=None,
+                          n_jobs=1,
+                          n_neighbors=5,
+                          p=2).fit(ratings_mtrx)
+</code>
+  </pre>
+<p>We write a function that would use our model to give the 5 most pertinent recommendations
+  given a title book:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  def get_recommends(book = "", verbose=False):
+      """ Take the title of a book and checks if it is in the database, then prints 5 recommendations using KNN and returns a list of
+      each recommendation with its distance, if verbose is set, it also prints the distances"""
+      try:
+          index = df_ratings_books_mtrx.index.get_loc(book)
+      except:
+          print("Couldn't find any :'(")
+          return [book, ["", 0.]*5]
+
+      knn_dist, knn_ind = model.kneighbors(df_ratings_books_mtrx.iloc[index, :].values.reshape(1, -1), n_neighbors = 6)
+      recommendations = [book, []]
+
+      for i in range(0, len(knn_dist.flatten())):
+          if i == 0:
+              book_to_recommand = df_ratings_books_mtrx.index[index]
+              print('Recommendations for {}:\n'.format(book_to_recommand))
+          else:
+              book_to_recommand = df_ratings_books_mtrx.index[knn_ind.flatten()[i]]
+              recommendations[1].append([book_to_recommand, knn_dist.flatten()[i]])
+              if verbose:
+                  print('{}: {}, with a distance of {:.4f}'.format(i, book_to_recommand, knn_dist.flatten()[i]))
+              else :
+                  print('{}: {}'.format(i, book_to_recommand))
+      return recommendations
+</code>
+</pre>
+<p>And we test it: here I picked the same book <em>The Da Vinci Code</em> from
+  the green Mile series</p>
+  <pre class="prettyprint">
+  <code class="language-python">
+    get_recommends(book = "The Da Vinci Code");
+    <span class="nocode" style="color:white;">
+    >>>
+        Recommendations for The Da Vinci Code:
+
+        1: Angels &amp; Demons
+        2: Widow's Walk
+        3: Doing Good
+        4: The Blue Nowhere : A Novel
+        5: Touching Evil
+  </code>
+  </pre>
+  <p>As a bonus, we write a function that would help us, using the <a href="https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance">Jaro distance</a>
+    to compare the similitudes between two chain of strings. We use the module <a href="https://rawgit.com/ztane/python-Levenshtein/master/docs/Levenshtein.html#Levenshtein-distance">Levenshtein</a>
+    for a very fast computation:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  def title_suggest(title, lst=list(dict.fromkeys(list(df_books['title']))), k=20):
+      """Gives available suggestions of books in the database based on the Jaro distance for string matching"""
+
+      comp = list()
+      for name in lst:
+          comp.append((name, lev.jaro(title, name)))
+      comp.sort(key=lambda x:x[1], reverse = True)
+      print("Possible suggestions:")
+      for i in range(k):
+          print(comp[i][0])
+      return comp[:5]
+</code>
+</pre>
+<p>And we try to get suggestions, say <em>memoirs of a Geisha</em>:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  title_suggest("Memoirs of a Geisha");
+  <span class="nocode" style="color:white;">
+  >>>
+      Possible suggestions:
+      Memoirs of a Geisha
+      Memoirs of a Geisha Uk
+      Memoirs of a Beatnik
+      Memoirs of a Pet Therapist
+      Memoirs of Elise
+      Memoirs of the Forties
+      Memoirs of an Invisible Man
+      Memoirs of a Medieval Woman
+      Memoirs of a Geisha : A Novel (AUDIO CASSETTE)
+      Memoirs of a Survivor
+      Memoirs of Fanny Hill
+      Memoirs of a Race Traitor
+      Memoirs
+      Memoirs of an Unfit Mother
+      Memoirs of a Bengal Civilian
+      Memoirs of a Mangy Lover
+      Promise of Paradise
+      Memoirs of a Voluptuary
+      Memoirs of a Lightkeeper's Son
+      Memoirs of a Dutiful Daughter
+</code>
+</pre>
+<p>The function <code>title_suggest</code> can be implemented in the function <code>get_recommends</code>
+  in the case where no title matched the input title.</p>
+  <ul>
+    If you are interested in the codes I used, you can find everything in
+    <li>my Github repository : <i class="material-icons" href="https://github.com/Sithlord-dev/Book_recommendation_engine">link</i></li>
+    <li>my Colab's notebook : <a href="https://colab.research.google.com/github/Sithlord-dev/Book_recommendation_engine/blob/main/Book_recommendation_engine.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+  </a></li>
+    </ul>
+    </div>
+ </div>
+</div>
+</div>
+</div>
+</div>

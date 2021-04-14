@@ -1,0 +1,106 @@
+<div class="container">
+
+<!-- Start of rows div -->
+<div class="row">
+
+  <div class="col s12 m13" style="padding-top: 30px; padding-right: 30px; padding-left: 30px;">
+   <div class="card z-depth-0" style="padding-top: 20px; padding-right: 10px; padding-left: 10px;">
+   <h3 class="center-align" style="padding-right: 20px; padding-left: 20px;"">TITLE</h3>
+   <p class="grey-text center-align">25th August 2019</p>
+     <div class="center-align">
+     <div class="chip">
+        Machine learning
+        </div>
+        <div class="chip">
+        Deep learning
+        </div>
+        <div class="chip">
+        python
+        </div>
+        <div class="chip">
+        TensorFlow
+        </div>
+      </div>
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+    <p>PRE DESCRIPTION</p>
+
+    <p>Kaggle/source DESCRIPTION <a href="https://www.kaggle.com/c/dog-breed-identification/overview">Kaggle dog breed identification competition</a>
+      which consists of a collection of 10,000+ labelled images of 120 different
+      dog breeds.</p>
+
+      <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+        <IMG src="ml/dog_vision/Guido.jpeg" style="display: block; margin-left: auto; margin-right: auto; width: 80%;">
+      </div>
+    <!-- put h tag in div give div an id and link # with that id to jump directly-->
+    <div id="title1" style="margin-top:50px;">
+      <h4><a href="#title1"><i class="material-icons">code</i></a> TASK TITLE</h4>
+    </div>
+    <p>TASK DESCRIPTION</p>
+    <p>Here is a short summary of what we will be doing:</p>
+    <ul class="collection">
+    <li class="collection-item"><strong>Data analysis</strong> - We prepare, study and explore the dataset, highliting important correlations.</li>
+    <li class="collection-item"><strong>Model modelling</strong> - we create and train a model to predict a target variable, then we tune the hyper-parameters of our model in order to improve it if possible.</li>
+    <li class="collection-item"><strong>Model evaluation and comparison</strong> - we evaluate it using some metrics and compare them to find the best one.  </li>
+    <li class="collection-item"><strong>Model experimentation</strong> - we try to improve the model through experimentation by starting with 1000 images to make sure it works.</li>
+    </ul>
+    <p>To work through these topics, we will use <mark style="background-color: #e4e6e8"><code>TensorFlow</code></mark> and <mark style="background-color: #e4e6e8"><code>Keras</code></mark>:</p>
+    <p>Let's import the main modules and libraries we will be working with:</p>
+    <pre class="prettyprint">
+<code class="language-python">
+  # Data analysis libraries
+  import numpy as np
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  from scipy.stats import linregress, norm
+
+  ## Tensorflow:
+  import tensorflow as tf
+  import tensorflow_hub as hub
+
+  ## keras model layers and callback:
+  import keras
+  from keras import models
+  from keras.models import Sequential, model_from_json
+  from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, GlobalAveragePooling2D, BatchNormalization, InputLayer, Lambda, Input
+  from keras.callbacks import TensorBoard, ModelCheckpoint
+  from keras.optimizers import Adam, RMSprop
+  from keras.models import Model, Input
+
+  ## Keras models
+  from keras import applications
+  from keras.applications.inception_v3 import InceptionV3
+  from keras.applications.nasnet import NASNetLarge
+  from keras.applications.inception_resnet_v2 import InceptionResNetV2
+  from keras.applications.xception import Xception
+
+  ## Scikit Learn Model evaluators:
+  from sklearn.model_selection import train_test_split, cross_val_score, KFold
+  from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
+  from sklearn import metrics
+  from sklearn.metrics import confusion_matrix, classification_report
+  from sklearn.metrics import precision_score, recall_score, f1_score
+
+  ## Loading images
+  import os
+  from urllib import request
+  from io import BytesIO
+
+  ## Preprocessing:
+  from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
+</code>
+    </pre>
+<h4> 1. Data analysis: </h4>
+
+  <!-- End of pre and code tag-->
+
+    </div>
+ </div>
+</div>
+</div>
+</div>
+</div>

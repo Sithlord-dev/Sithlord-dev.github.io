@@ -1,0 +1,1021 @@
+<div class="container">
+
+<!-- Start of rows div -->
+<div class="row">
+
+  <div class="col s12 m13" style="padding-top: 30px; padding-right: 30px; padding-left: 30px;">
+   <div class="card z-depth-0" style="padding-top: 20px; padding-right: 10px; padding-left: 10px;">
+   <h3 class="center-align" style="padding-right: 20px; padding-left: 20px;"">Dog bread classification using convolutional neural networks 🐕</h3>
+   <p class="grey-text center-align">25th August 2019</p>
+     <div class="center-align">
+     <div class="chip">
+        Machine learning
+        </div>
+        <div class="chip">
+        Deep learning
+        </div>
+        <div class="chip">
+        Computer vision
+        </div>
+        <div class="chip">
+        python
+        </div>
+        <div class="chip">
+        TensorFlow
+        </div>
+      </div>
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+    <p>In this multi-class image classification project, we use Deep Learning, and particularily convolutional neural
+      networks to build a model that will help us identify up to 120 different breeds
+      of dogs 🐩</p>
+
+    <p>We will use <a href="https://www.kaggle.com/c/dog-breed-identification/overview">Kaggle dog breed identification competition</a>
+      which consists of a collection of 10,000+ labelled images of 120 different
+      dog breeds.</p>
+
+      <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+        <IMG src="ml/dog_vision/Guido.jpeg" style="display: block; margin-left: auto; margin-right: auto; width: 80%;">
+      </div>
+    <!-- put h tag in div give div an id and link # with that id to jump directly-->
+    <div id="title1" style="margin-top:50px;">
+      <h4><a href="#title1"><i class="material-icons">code</i></a> Multi-label image classification:</h4>
+    </div>
+    <p>In image classification problems, convolutional neural networks (CNN for short)
+      are somehow one of the most popular and effective neural network models to
+      consider, especially if it is combined with Data augumentation.</p>
+    <p>Here is a short summary of what we will be doing:</p>
+    <ul class="collection">
+    <li class="collection-item"><strong>Data analysis</strong> - We prepare, study and explore the dataset, highliting important correlations.</li>
+    <li class="collection-item"><strong>Model modelling</strong> - we create and train a model to predict a target variable, then we tune the hyper-parameters of our model in order to improve it if possible.</li>
+    <li class="collection-item"><strong>Model evaluation and comparison</strong> - we evaluate it using some metrics and compare them to find the best one.  </li>
+    <li class="collection-item"><strong>Model experimentation</strong> - we try to improve the model through experimentation by starting with 1000 images to make sure it works.</li>
+    </ul>
+    <p>To work through these topics, we will use <mark style="background-color: #e4e6e8"><code>TensorFlow</code></mark> and <mark style="background-color: #e4e6e8"><code>Keras</code></mark>:</p>
+    <p>Let's import the main modules and libraries we will be working with:</p>
+    <pre class="prettyprint">
+<code class="language-python">
+  # Data analysis libraries
+  import numpy as np
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  from scipy.stats import linregress, norm
+
+  ## Tensorflow:
+  import tensorflow as tf
+  import tensorflow_hub as hub
+
+  ## keras model layers and callback:
+  import keras
+  from keras import models
+  from keras.models import Sequential, model_from_json
+  from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, GlobalAveragePooling2D, BatchNormalization, InputLayer, Lambda, Input
+  from keras.callbacks import TensorBoard, ModelCheckpoint
+  from keras.optimizers import Adam, RMSprop
+  from keras.models import Model, Input
+
+  ## Keras models
+  from keras import applications
+  from keras.applications.inception_v3 import InceptionV3
+  from keras.applications.nasnet import NASNetLarge
+  from keras.applications.inception_resnet_v2 import InceptionResNetV2
+  from keras.applications.xception import Xception
+
+  ## Scikit Learn Model evaluators:
+  from sklearn.model_selection import train_test_split, cross_val_score, KFold
+  from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
+  from sklearn import metrics
+  from sklearn.metrics import confusion_matrix, classification_report
+  from sklearn.metrics import precision_score, recall_score, f1_score
+
+  ## Loading images
+  import os
+  from urllib import request
+  from io import BytesIO
+
+  ## Preprocessing:
+  from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
+</code>
+    </pre>
+<h4> 1. Data analysis: </h4>
+<p>We start by reading our CSV file using <mark style="background-color: #e4e6e8"><code>pandas</code></mark> :</p>
+    <pre class="prettyprint">
+<code class="language-python">
+  train_df = pd.read_csv("files/dog_breed/files/labels.csv")
+  train_df.describe()
+  train_df.head()
+</code>
+    </pre>
+<p>We have in total 10.222 images ids with a total of 120 breed. Our dataFrame looks
+like this: The rows in the dataset represent image ids for each dog breed.</p>
+<div class="container">
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="striped">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>breed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>000bec180eb18c7604dcecc8fe0dba07</td>
+      <td>boston_bull</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>001513dfcb2ffafc82cccf4d8bbaba97</td>
+      <td>dingo</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>001cdf01b096e06d78e9e5112d419397</td>
+      <td>pekinese</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>00214f311d5d2247d5dfe4fe24b2303d</td>
+      <td>bluetick</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0021f9ceb3235effd7fcde7f7538ed62</td>
+      <td>golden_retriever</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+
+<p> We check how these <strong>labels</strong> are distributed: We have an average of 82 picture per breed</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/dog_vision/label_dist.png" style="background-color:white;">
+</div>
+<h5>1.1. Data pre-processing: Labels</h5>
+<p>We first make some Hot Encoding: we encode our labels into a boolean format</p>
+<pre class="prettyprint">
+<code class="language-python">
+  labels = np.array(train_df['breed'])
+  breeds = np.unique(labels)
+
+  enc_labels = [ label == np.array(breeds) for label in labels ]
+</code>
+</pre>
+and we use Scikit Learn's <mark style="background-color: #e4e6e8"><code>train_test_split</code></mark>
+to create a validation set: Here, we will first train our model on a subset of <thead>
+  data to see how it is performing.
+</thead>
+<pre class="prettyprint">
+<code class="language-python">
+  # dataset variables
+  X = img_name
+  y = enc_labels
+
+  # set a size parameter
+  SUBSET_SIZE = 1000
+
+  # set random seed
+  np.random.seed(1729)
+
+  # create validation set for the subset_data:
+  X_train, X_val, y_train, y_val = train_test_split(X[:SUBSET_SIZE],
+                                                    y[:SUBSET_SIZE],
+                                                    test_size = 0.2)
+</code>
+</pre>
+<h5>1.2. Data pre-processing: Images</h5>
+<p>We want to create a function that would process our images: TensorFlow's <a href="https://www.tensorflow.org/tutorials/load_data/images">documentation</a>
+  suggests that we convert our data into <em>batches</em> of <code>(image, label)</code> tensors:
+  </p>
+  <pre class="prettyprint">
+  <code class="language-python">
+    # Choose a size
+    IMG_SIZE = 224
+
+    def img_process(img_path) :
+        '''
+        Processes and converts an image path into a tensor
+        '''
+        # read image path
+        img = tf.io.read_file(img_path)
+        #Tensorize the image
+        img = tf.image.decode_jpeg(img, channels = 3)
+        #Normalize the tensor
+        img = tf.image.convert_image_dtype(img, tf.float32)
+        #resize the image
+        img = tf.image.resize(img, size = [IMG_SIZE, IMG_SIZE])
+
+        return img
+
+    def img_label_get(img_path, label):
+        '''
+        Processes and converts an image path into a tensor and returns a tuple (image, label)
+        '''
+        img = img_process(img_path)
+        return img, label
+  </code>
+  </pre>
+  <p> and we create a function that will creates small batches:</p>
+  <pre class="prettyprint">
+  <code class="language-python">
+    # Define a batch size
+    BATCH_SIZE = 32
+
+    def Batch(img, label=None, batch_size = BATCH_SIZE, valid_data = False, test_data = False):
+        '''
+          Creates batches of data out of an (image, label) pairs.
+          Shuffles the data only if it's training data.
+          Accepts test data as input (no labels).
+        '''
+        # valid dataset, no need to shuffle
+        if valid_data == True :
+            print("Creating validation data batches...")
+            data = tf.data.Dataset.from_tensor_slices((tf.constant(img), # filepaths
+                                                       tf.constant(label)) #labels
+                                                      ).cache().prefetch(tf.data.AUTOTUNE)
+            data_batch = data.map(img_label_get).batch(BATCH_SIZE)
+            print('Done!')
+            return data_batch
+
+        # test dataset, no labels
+        if test_data == True :
+            print("Creating test data batches...")
+            data = tf.data.Dataset.from_tensor_slices((tf.constant(img))) # no labels
+            data_batch = data.map(img_process).batch(BATCH_SIZE)
+            print('Done!')
+            return data_batch
+
+        else:
+            #Tensorize and shuffle training dataset
+            print("Creating training data batches...")
+            data = tf.data.Dataset.from_tensor_slices((tf.constant(img),
+                                                      tf.constant(label))
+                                                     ).cache().shuffle(buffer_size = len(img)).prefetch(tf.data.AUTOTUNE)
+            data = data.map(img_label_get)
+            data_batch = data.batch(BATCH_SIZE)
+            print('Done!')
+            return data_batch
+  </code>
+  </pre>
+<p>Now, we batch our dat sets:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  train_data = Batch(X_train, y_train)
+  val_data = Batch(X_val, y_val, valid_data=True)
+</code>
+</pre>
+Our batches now have the following attributes:
+<pre class="prettyprint">
+<code>
+<span class="nocode" style="color:white;">((TensorSpec(shape=(None, 224, 224, 3), dtype=tf.float32, name=None),
+  TensorSpec(shape=(None, 120), dtype=tf.bool, name=None))</span>
+</code>
+</pre>
+<h5>2. Data moddeling:</h5>
+<p>We will test our data set and our modelisation usibng Transfer learning: we will
+  use a very known and pretrained model for dog related classifications: <a href="https://tfhub.dev/google/imagenet/mobilenet_v2_140_224/classification/4">Mobilenet v2</a>
+  from <a href="https://tfhub.dev/s?dataset=imagenet-ilsvrc-2012-cls&amp;module-type=image-classification">Tensorflow Hub</a></p>
+  <h5>2.1. Instantiate a pre-trained model:</h5>
+  <pre class="prettyprint">
+  <code class="language-python">
+    # Setup input shape
+    INPUT_SHAPE = [None, 224, 224, 3] # batch, height, width, colour channels
+
+    # Setup output shape
+    OUTPUT_SHAPE = len(breeds) # number of unique labels
+
+    #pre trained model from tensorflow_hub:
+    MODEL_URL = 'https://tfhub.dev/google/imagenet/mobilenet_v2_140_224/classification/4'
+  </code>
+  </pre>
+<p>We create a function that will build a <code>keras</code> model from our inputs:</p>
+  <pre class="prettyprint">
+  <code class="language-python">
+    def build_model(input_shape=INPUT_SHAPE, output_shape=OUTPUT_SHAPE, model_url=MODEL_URL):
+      '''
+      Creates and builds and returns a keras model from input shape, output shape and url
+      '''
+      print("Building model with:", model_url.split('/')[5])
+
+      # Setup the layers
+      model = Sequential([
+      hub.KerasLayer(model_url), # input layer
+      Dense(output_shape, activation="softmax")]) # output layer
+
+      # Compile the model
+      opt = Adam(lr=0.001) # Gradient descent ptimizer
+      model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
+
+      # Build the model
+      model.build(input_shape) # Let the model know what kind of inputs it'll be getting
+
+      return model
+  </code>
+  </pre>
+<p>And we build our model: </p>
+<pre class="prettyprint">
+<code>
+<span class="nocode" style="color:white;">
+  Building model with: mobilenet_v2_140_224
+  Model: "sequential"
+  _________________________________________________________________
+  Layer (type)                 Output Shape              Param #
+  =================================================================
+  keras_layer (KerasLayer)     (None, 1001)              6158505
+  _________________________________________________________________
+  dense (Dense)                (None, 120)               120240
+  =================================================================
+  Total params: 6,278,745
+  Trainable params: 120,240
+  Non-trainable params: 6,158,505
+</code>
+</pre>
+<h5>2.2. Train its upper dense layer:</h5>
+<pre class="prettyprint">
+<code class="language-python">
+  NUM_EPOCHS = 100
+
+  def build_model(input_shape=INPUT_SHAPE, output_shape=OUTPUT_SHAPE, model_url=MODEL_URL):
+    '''
+    Creates and builds and returns a keras model from input shape, output shape and url
+    '''
+    print("Building model with:", model_url.split('/')[5])
+
+    # Setup the layers
+    model = Sequential([
+    hub.KerasLayer(model_url), # input layer
+    Dense(output_shape, activation="softmax")]) # output layer
+
+    # Compile the model
+    opt = Adam(lr=0.001) # Gradient descent ptimizer
+    model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
+
+    # Build the model
+    model.build(input_shape) # Let the model know what kind of inputs it'll be getting
+
+    return model
+</code>
+</pre>
+<p>and we train our model: The first impression that we get is that the model is
+clearly overfitting: its performance on the training test outstands its results
+on the validation set</p>
+<pre class="prettyprint">
+<code>
+<span class="nocode" style="color:white;">
+  ...
+  Epoch 7/100
+  25/25 [==============================] - 5s 216ms/step - loss: 0.0757 - accuracy: 1.0000 - val_loss: 1.2328 - val_accuracy: 0.6750
+  Epoch 8/100
+  25/25 [==============================] - 5s 215ms/step - loss: 0.0581 - accuracy: 1.0000 - val_loss: 1.2111 - val_accuracy: 0.6800
+  ...
+  Epoch 13/100
+  25/25 [==============================] - 5s 216ms/step - loss: 0.0266 - accuracy: 1.0000 - val_loss: 1.1501 - val_accuracy: 0.6950
+  Epoch 14/100
+  25/25 [==============================] - 5s 215ms/step - loss: 0.0235 - accuracy: 1.0000 - val_loss: 1.1402 - val_accuracy: 0.6950
+</code>
+</pre>
+<p>Now, training the model on the whole data set (preferably using a GPU)</p>
+<pre class="prettyprint">
+<code class="language-python">
+model.evaluate(val_data)
+</code>
+</pre>
+<p> we see that we reach an accuracy of 82% with a loss of 0.64</p>
+<pre class="prettyprint">
+<code>
+<span class="nocode" style="color:white;">
+  64/64 [==============================] - 793s 12s/step - loss: 0.6375 - accuracy: 0.8152
+</code>
+</pre>
+<p>It's time to make some predictions</p>
+<pre class="prettyprint">
+<code class="language-python">
+predictions = model.predict(val_data, verbose=1)
+</code>
+</pre>
+<p>and see how our model is doing:</p>
+  <div class="slider" style="width:70%">
+    <ul class="slides">
+      <li>
+        <img src="ml/dog_vision/pred_1.png">
+      </li>
+      <li>
+        <img src="ml/dog_vision/pred_2.png">
+      </li>
+      <li>
+        <img src="ml/dog_vision/pred_3.png">
+      </li>
+      <li>
+        <img src="ml/dog_vision/pred_4.png">
+      </li>
+    </ul>
+  </div>
+  <p>We can start printing out a classification report:</p>
+  <pre class="prettyprint">
+  <code class="language-python">
+    report = classification_report(np.argmax(predictions,axis=1), np.argmax(yf_val, axis=1), target_names=breeds, output_dict=True)
+
+    report_df = pd.DataFrame(report).T
+    report_df
+  </code>
+  </pre>
+  <table border="1" class="striped">
+    <thead>
+      <tr style="text-align: right;">
+        <th></th>
+        <th>precision</th>
+        <th>recall</th>
+        <th>f1-score</th>
+        <th>support</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>affenpinscher</th>
+        <td>0.777778</td>
+        <td>0.875000</td>
+        <td>0.823529</td>
+        <td>16.000000</td>
+      </tr>
+      <tr>
+        <th>afghan_hound</th>
+        <td>0.931034</td>
+        <td>0.964286</td>
+        <td>0.947368</td>
+        <td>28.000000</td>
+      </tr>
+      <tr>
+        <th>african_hunting_dog</th>
+        <td>1.000000</td>
+        <td>1.000000</td>
+        <td>1.000000</td>
+        <td>16.000000</td>
+      </tr>
+      <tr>
+        <th>airedale</th>
+        <td>0.964286</td>
+        <td>0.900000</td>
+        <td>0.931034</td>
+        <td>30.000000</td>
+      </tr>
+      <tr>
+        <th>american_staffordshire_terrier</th>
+        <td>0.692308</td>
+        <td>0.450000</td>
+        <td>0.545455</td>
+        <td>20.000000</td>
+      </tr>
+      <tr>
+        <th>...</th>
+        <td>...</td>
+        <td>...</td>
+        <td>...</td>
+        <td>...</td>
+      </tr>
+      <tr>
+        <th>wire-haired_fox_terrier</th>
+        <td>0.857143</td>
+        <td>0.600000</td>
+        <td>0.705882</td>
+        <td>20.000000</td>
+      </tr>
+      <tr>
+        <th>yorkshire_terrier</th>
+        <td>0.750000</td>
+        <td>0.631579</td>
+        <td>0.685714</td>
+        <td>19.000000</td>
+      </tr>
+      <tr>
+        <th>accuracy</th>
+        <td>0.815159</td>
+        <td>0.815159</td>
+        <td>0.815159</td>
+        <td>0.815159</td>
+      </tr>
+      <tr>
+        <th>macro avg</th>
+        <td>0.804588</td>
+        <td>0.810483</td>
+        <td>0.800445</td>
+        <td>2045.000000</td>
+      </tr>
+      <tr>
+        <th>weighted avg</th>
+        <td>0.829992</td>
+        <td>0.815159</td>
+        <td>0.815969</td>
+        <td>2045.000000</td>
+      </tr>
+    </tbody>
+  </table>
+<p>Our model feels more confident about gessing the following breeds:</p>
+<pre class="prettyprint">
+<code>
+  <code class="language-python">
+    report_df['precision'].sort_values(ascending = False)[:10]
+  </code>
+  <span class="nocode" style="color:white;">
+  >>>
+      japanese_spaniel               1.0
+      soft-coated_wheaten_terrier    1.0
+      african_hunting_dog            1.0
+      curly-coated_retriever         1.0
+      papillon                       1.0
+      west_highland_white_terrier    1.0
+      clumber                        1.0
+      chow                           1.0
+      saint_bernard                  1.0
+      cardigan                       1.0
+      Name: precision, dtype: float64
+  </code>
+</pre>
+<p>and way about gessing the following ones:</p>
+<pre class="prettyprint">
+<code>
+  <code class="language-python">
+    report_df['precision'].sort_values(ascending = True)[:10]
+  </code>
+  <span class="nocode" style="color:white;">
+  >>>
+      eskimo_dog                   0.181818
+      miniature_poodle             0.357143
+      walker_hound                 0.400000
+      border_collie                0.400000
+      boxer                        0.466667
+      staffordshire_bullterrier    0.466667
+      chihuahua                    0.523810
+      lakeland_terrier             0.555556
+      flat-coated_retriever        0.588235
+      malamute                     0.600000
+      Name: precision, dtype: float64
+  </code>
+</pre>
+<p>It does not seem too bad! Although, as we have seen in the subset training, our model
+is maybe overfitting and these results might be misleading. Let's try to improve
+our model and use a more accuracte evaluation :</p>
+<h4>Model tuning</h4>
+<h5>3.1. Data augementation:</h5>
+<p>One way to avoid that is using <a href="https://bair.berkeley.edu/blog/2019/06/07/data_aug/">Data augmentation</a>:
+  we take the training images and manipulate (crop, resize) or distort them (flip, rotate)
+  to create more generalized patterns for the model to learn from. </p>
+<p><strong>NOTE:</strong> Data augmentation is an <em>augementation</em> in the
+  sense where it increases the generalizability of the model, and NOT an actual
+  addition or increase in the dataset, i.e. it does not increase the size of the
+  dataset per se.</p>
+<p> We will use the class from keras.preprocessing. which will generate batches
+  of tensor image data with real-time data augmentation:</p>
+    <pre class="prettyprint">
+<code class="language-python">
+ datagen = ImageDataGenerator(rescale=1./255,
+                             validation_split=0.2,
+                             rotation_range=45, # randomly rotate pictures
+                             width_shift_range=0.2, # randomly translate pictures vertically
+                             height_shift_range=0.2, # randomly translate pictures horizontally
+                             shear_range=0.2, # randomly applying shearing transformations.
+                             zoom_range=0.25, # randomly zoom inside pictures.
+                             horizontal_flip=True, # randomly flip half the images horizontally
+                             fill_mode='nearest')
+</code>
+  </pre>
+<p>This is how a batch of augmented images would look like:</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/dog_vision/image_aug.png" style="background-color:white;">
+</div>
+<h5>3.2. Dropouts:</h5>
+<p>Dropouts is another technique that helps preventing overfitting, by regulizing
+  deep neural networks : https://jmlr.org/papers/v15/srivastava14a.html </p>
+  <pre class="prettyprint">
+    <code>
+    <span class="nocode" style="color:white;">
+  Model: "sequential"
+  _________________________________________________________________
+  Layer (type)                 Output Shape              Param #
+  =================================================================
+  keras_layer (KerasLayer)     (None, 1001)              6158505
+  _________________________________________________________________
+  dense (Dense)                (None, 256)               256512
+  _________________________________________________________________
+  dropout (Dropout)            (None, 256)               0
+  _________________________________________________________________
+  dense_1 (Dense)              (None, 120)               30840
+  =================================================================
+  Total params: 6,445,857
+  Trainable params: 287,352
+  Non-trainable params: 6,158,505
+    </code>
+  </pre>
+<h5>3.3. K-fold cross validation:</h5>
+<p>We now evaluate our model on a 5-fold cross validation process. This will ensure
+that the estimation and evaluation of our model has the least bias. Here is a big
+pipeline-like code where we put everything together:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  VALIDATION_ACCURACY = []
+  VALIDATION_LOSS = []
+
+  fold = 1
+  kf = KFold(n_splits = 5, shuffle = True, random_state = 1729)
+
+  # Set up manual K-fold cross validation:
+  for train_index, test_index in kf.split(train_df):
+    trainData = train_df.iloc[train_index]
+    testData = train_df.iloc[test_index]
+    print('Initializing Kfold %s'%str(fold))
+    print('Train shape:',trainData.shape)
+    print('Test shape:',testData.shape)
+    epochs = 100
+
+    # prepare training and validation generators
+    train_datagen = ImageDataGenerator(rescale=1./255,
+                                    validation_split=0.2,
+                                    rotation_range=45, # randomly rotate pictures
+                                    width_shift_range=0.2, # randomly translate pictures vertically
+                                    height_shift_range=0.2, # randomly translate pictures horizontally
+                                    shear_range=0.2, # randomly applying shearing transformations.
+                                    zoom_range=0.25, # randomly zoom inside pictures.
+                                    horizontal_flip=True, # randomly flip half the images horizontally
+                                    fill_mode='nearest')
+    valid_datagen = ImageDataGenerator(rescale=1. / 255)
+
+    # Create a flow from dataframe for training data
+    train_gen = train_datagen.flow_from_dataframe(dataframe=trainData,
+                                                  directory=train_dir,
+                                                  x_col="id",
+                                                  y_col="breed",
+                                                  subset="training",
+                                                  shuffle=True,
+                                                  seed=1729,
+                                                  target_size=(IMG_SIZE, IMG_SIZE),
+                                                  batch_size=BATCH_SIZE,
+                                                  class_mode="categorical")
+    valid_gen = train_datagen.flow_from_dataframe(dataframe=trainData,
+                                                  directory=train_dir,
+                                                  x_col="id",
+                                                  y_col="breed",
+                                                  subset="validation",
+                                                  target_size=(IMG_SIZE, IMG_SIZE),
+                                                  batch_size=BATCH_SIZE,
+                                                  class_mode="categorical")
+
+    # Create the model
+    model_full_aug = Sequential([
+    hub.KerasLayer(MODEL_URL), # input layer
+    Dense(256, activation='relu'),
+    Dropout(0.5),
+    Dense(OUTPUT_SHAPE, activation="softmax")]) # output layer
+
+    # Compile the model
+    opt = Adam(lr=0.001) # Gradient descent ptimizer
+    model_full_aug.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
+
+    # Build the model
+    model_full_aug.build(INPUT_SHAPE)
+
+    # Setting callbacks
+    early_stopping = tf.keras.callbacks.EarlyStopping(monitor="val_accuracy", patience=8)
+    checkpoint = tf.keras.callbacks.ModelCheckpoint(model_dir+get_model_name(fold),
+                                                    monitor='val_accuracy',
+                                                    verbose=1,
+                                                    save_best_only=True,
+                                                    mode='max')
+
+    # Train the model
+    history_aug = model_full_aug.fit(x = train_gen,
+                                    steps_per_epoch = train_gen.n // train_gen.batch_size,
+                                    epochs = NUM_EPOCHS,
+                                    validation_data = valid_gen,
+                                    validation_steps = valid_gen.n // valid_gen.batch_size,
+                                    callbacks = [early_stopping, checkpoint])
+
+    # LOAD BEST MODEL to evaluate the performance of the model
+    model.load_weights(model_dir+"model_"+str(fold)+"fold.h5")
+    results = model.evaluate(valid_gen)
+    results = dict(zip(model_full_aug.metrics_names,results))
+
+    VALIDATION_ACCURACY.append(results['accuracy'])
+    VALIDATION_LOSS.append(results['loss'])
+
+    tf.keras.backend.clear_session()
+
+    fold += 1
+</code>
+</pre>
+And we can see the results:
+<div class="container" style="margin-left: auto;margin-right: auto;width: 600px;">
+    <img class="materialboxed" data-caption="" width="600" src="ml/dog_vision/cv_eval.png" style="background-color:white;">
+</div>
+<p>Here we actually did not have any significant improvement in accuracy. However,
+  the model is not overfitting as the gap is smaller between the validation and
+  the training curves, which is still an improvement</p>
+
+<h4>4. Feature extraction</h4>
+<p>At last, we will use feature extraction on known trained models on imageNet in order to boost our transfer learning process. This might give us a significant improvement of our classification. We will explore the following models:</p>
+<ul>
+<li><a href="https://arxiv.org/abs/1512.03385">Resnet50</a> </li>
+<li><a href="https://arxiv.org/abs/1610.02357">Xception</a> </li>
+<li><a href="https://arxiv.org/abs/1512.00567">Inception V3</a> </li>
+<li><a href="https://arxiv.org/abs/1602.07261">Inception-Resnet</a></li>
+<li><a href="https://arxiv.org/abs/1707.07012">NasNet</a> </li>
+</ul>
+<p>We first modify our function in order to quickly and efficiently preprocess our
+  data: We chose the target size <code>(331, 331, 3)</code> because it iss the one
+  dictated by NasNetLarge if one loads it with <code>weights='imagnet'</code></p>
+<pre class="prettyprint">
+<code class="language-python">
+  TARGET_SIZE = (331,331,3)
+
+  def images_to_array(directory, dataframe, target_size = TARGET_SIZE):
+      images = np.zeros([len(dataframe), target_size[0], target_size[1], target_size[2]], dtype=np.uint8)
+      img = ''
+      for ix, image_name in enumerate(dataframe['id'].values):
+          img_dir = os.path.join(directory, image_name + '.jpg')
+          img = load_img(img_dir, target_size = target_size)
+          images[ix] = img_to_array(img)
+      del img
+      label_dict = dict(enumerate(dataframe['breed'].unique()))
+      return images, label_dict
+</code>
+</pre>
+<p>We write a function that would run the convolutional base over our data,
+  record its predictions so we can later feed them to a pretty simple CNN with
+  a dense layer and some dropout: this is somehow less costly as we only need to
+  run the convolutional base once for every image. However, we will not be able to
+  use data augmentation here... as using it is by far way more costly
+  (we would need to add Dense layers on top of the convolutional base , by using
+  <code>DataImageGenerator</code>, and run it all on the input data)</p>
+  <pre class="prettyprint">
+  <code class="language-python">
+  def get_features(model, preprocess_input, images, target_size = TARGET_SIZE):
+
+      conv_base = model(input_shape = target_size, include_top=False, weights='imagenet', pooling = 'avg')
+
+      cnn = Sequential([
+      InputLayer(input_shape = target_size), # input layer
+      Lambda(preprocess_input), # preprocessing layer
+      conv_base ]) # base model
+
+      features = cnn.predict(images)
+
+      print('feature-map shape: {}'.format(features.shape))
+      return features
+  </code>
+  </pre>
+We start our process of feature extraction:
+<ul>
+<li>Resnet50:</li>
+<pre class="prettyprint">
+<code class="language-python">
+  InceptionResNetV2(input_shape=TARGET_SIZE, include_top=False, weights='imagenet')
+  from keras.applications.inception_resnet_v2 import preprocess_input
+
+  resnet_preprocess = preprocess_input
+  resnet_features = get_features(InceptionResNetV2, resnet_preprocess, train_images)
+</code>
+</pre>
+<li>Xception: </li>
+<pre class="prettyprint">
+<code class="language-python">
+  Xception(input_shape=TARGET_SIZE, include_top=False, weights='imagenet')
+  from keras.applications.xception import preprocess_input
+
+  xception_preprocess = preprocess_input
+  xception_features = get_features(Xception, xception_preprocess, train_images)
+</code>
+</pre>
+<li>Inception V3: </li>
+<pre class="prettyprint">
+<code class="language-python">
+  InceptionV3(input_shape=TARGET_SIZE, include_top=False, weights='imagenet')
+  from keras.applications.inception_v3 import preprocess_input
+
+  inception_preprocess = preprocess_input
+  inception_features = get_features(InceptionV3, inception_preprocess, train_images)
+</code>
+</pre>
+<li>Nasnet: </li>
+<pre class="prettyprint">
+<code class="language-python">
+  NASNetLarge(input_shape=TARGET_SIZE, include_top=False, weights='imagenet')
+  from keras.applications.nasnet import preprocess_input
+
+  nasnet_preprocessor = preprocess_input
+  nasnet_features = get_features(NASNetLarge, nasnet_preprocessor, train_images)
+</code>
+</pre>
+</ul>
+<p>Finally, we stack up all our features and flatten it so we can feed it to
+  our new CNN:</p>
+  <pre class="prettyprint">
+<code class="language-python">
+  final_features = np.concatenate([resnet_features, xception_features, inception_features, nasnet_features], axis = 1)
+
+  print('final features shape: {}'.format(final_features.shape))
+  <span class="nocode" style="color:white;">
+  >>>
+      final features shape: (10222, 9664)
+</code>
+  </pre>
+<p>Now, we define our densely connected classifier:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  FEATURES_SHAPE = final_features.shape[1]
+
+  cnn_model = Sequential([
+  InputLayer(input_shape = (FEATURES_SHAPE, )), # input layer
+  BatchNormalization(),
+  Dense(4096, activation = 'relu'),
+  Dropout(0.5),
+  Dense(1024, activation='relu'),
+  Dropout(0.7),
+  Dense(len(class_to_index), activation="softmax")]) # output layer
+
+  # Compile the model
+  opt = Adam(lr=0.001) # Gradient descent ptimizer
+  #opt = RMSprop(lr=0.001, rho=0.9)
+  cnn_model.compile(optimizer=opt, loss='sparse_categorical_crossentropy', metrics=['accuracy']).summary()
+  <span class="nocode" style="color:white;">
+  >>>
+      Model: "sequential_4"
+      _________________________________________________________________
+      Layer (type)                 Output Shape              Param #
+      =================================================================
+      batch_normalization_301 (Bat (None, 9664)              38656
+      _________________________________________________________________
+      dense (Dense)                (None, 4096)              39587840
+      _________________________________________________________________
+      dropout (Dropout)            (None, 4096)              0
+      _________________________________________________________________
+      dense_1 (Dense)              (None, 1024)              4195328
+      _________________________________________________________________
+      dropout_1 (Dropout)          (None, 1024)              0
+      _________________________________________________________________
+      dense_2 (Dense)              (None, 120)               123000
+      =================================================================
+      Total params: 43,944,824
+      Trainable params: 43,925,496
+      Non-trainable params: 19,328
+</code>
+  </pre>
+<p>and train it on the data and labels that we just collected:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  # Train the model
+  history1 = cnn_model.fit(final_features,
+                      labels,
+                      steps_per_epoch = len(final_features) // len(labels),
+                      epochs = NUM_EPOCHS,
+                      validation_split = 0.2,
+                      callbacks = [early_stopping])
+  <span class="nocode" style="color:white;">
+  >>>
+      ...
+      Epoch 4/100
+      1/1 [==============================] - 1s 806ms/step - loss: 0.3666 - accuracy: 0.9083 - val_loss: 2.5747 - val_accuracy: 0.9267
+      Epoch 5/100
+      1/1 [==============================] - 1s 827ms/step - loss: 0.3241 - accuracy: 0.9175 - val_loss: 2.3619 - val_accuracy: 0.9286
+      ...
+      Epoch 40/100
+      1/1 [==============================] - 1s 853ms/step - loss: 0.0929 - accuracy: 0.9716 - val_loss: 0.5167 - val_accuracy: 0.9364
+      Epoch 41/100
+      1/1 [==============================] - 1s 801ms/step - loss: 0.0924 - accuracy: 0.9702 - val_loss: 0.5054 - val_accuracy: 0.9389
+</code>
+  </pre>
+<p>We can finally evaluate our model and see how it is doing, here we choose two
+  gradient deccent optimizers: <mark style="background-color: #e4e6e8"><code>Adam</code></mark>
+   and <mark style="background-color: #e4e6e8"><code>RMSprop</code></mark> :</p>
+   <div class="container" style="margin-left: auto;margin-right: auto;width: 600px;">
+       <img class="materialboxed" data-caption="" width="500" src="ml/dog_vision/final_eval.png" style="background-color:white;">
+   </div>
+<p><b>OPTIONAL:</b> As our model seem a bit space-consuming, we can choose to save
+it as an architecture (using the <mark style="background-color: #e4e6e8"><code>.to_json</code></mark>
+method) and weights (using the <mark style="background-color: #e4e6e8"><code>.save_weights</code></mark>
+method)</p>
+<pre class="prettyprint">
+<code class="language-python">
+  # serialize model to JSON
+  model_json = cnn_model.to_json()
+  with open("model.json", "w") as json_file:
+    json_file.write(model_json)
+  # serialize weights to HDF5
+  cnn_model.save_weights("cnn_model_weights.h5")
+  print("Saved model to disk")
+</code>
+  </pre>
+<p>And to load, one simply uses:</p>
+<pre class="prettyprint">
+  <code class="language-python">
+  # load json and create model
+  json_file = open('model.json', 'r')
+  loaded_model_json = json_file.read()
+  json_file.close()
+  model = model_from_json(loaded_model_json)
+  model.load_weights("cnn_model_weights.h5")
+  print("Loaded model from disk")
+</code>
+  </pre>
+<h5>Conclusion</h5>
+<p>We reached a pretty nice accuracy (>95%) so as a nice application, we would like
+  to use our model to predict dog breeds from random images on the net. We will write
+  some code to make that possible: </p>
+  <pre class="prettyprint">
+    <code class="language-python">
+      TARGET_SIZE = (331,331,3)
+      from PIL import Image
+
+      def dog_vision(model, source, local=False, target_size = TARGET_SIZE):
+        img = ''
+        if local:
+          # Get image from directory
+          image_paths = [source + fname for fname in os.listdir(source)]
+          images = np.zeros([len(image_paths), target_size[0], target_size[1], target_size[2]], dtype=np.uint8)
+          for _, path in enumerate(image_paths):
+            img = load_img(path, target_size = target_size)
+            images[_] = img_to_array(img)
+        else:
+          images = np.zeros([1, target_size[0], target_size[1], target_size[2]], dtype=np.uint8)
+          req = request.urlopen(source).read()
+          img = Image.open(BytesIO(req)).resize((target_size[0], target_size[1]))
+          images[0] = img_to_array(img)
+        del img
+
+          # run feature extraction
+        resnet_features = get_features(InceptionResNetV2, resnet_preprocess, images)
+        xception_features = get_features(Xception, xception_preprocess, images)
+        inception_features = get_features(InceptionV3, inception_preprocess, images)
+        nasnet_features = get_features(NASNetLarge, nasnet_preprocessor, images)
+        final_features = np.concatenate([resnet_features, xception_features, inception_features, nasnet_features], axis = 1)
+        del resnet_features, xception_features, inception_features, nasnet_features
+
+          # Make predictions
+        predictions = model.predict(final_features)
+
+        labels = dict(enumerate(train_df['breed'].unique()))
+
+        # Check custom image predictions
+        plt.figure(figsize=(10, 15))
+        for i, image in enumerate(images):
+          plt.subplot(4, 3, i+1)
+          plt.xticks([])
+          plt.yticks([])
+          plt.title(labels[np.argmax(predictions[i])])
+          plt.imshow(image);
+
+        tf.keras.backend.clear_session()
+  </code>
+    </pre>
+<p>and you can try it out too! </p>
+<pre class="prettyprint">
+<code class="language-python">
+  local_dir = "files/dogs/"
+  URL = "https://images.theconversation.com/files/342682/original/file-20200618-41213-iu7wbs.jpg?ixlib=rb-1.1.0&rect=9%2C4%2C3268%2C2177&q=45&auto=format&w=926&fit=clip"
+
+  # load model
+  cnn = load_model("models/cnn_dogvision.h5")
+
+  dog_vision(cnn, local_dir, local=True)
+  #dog_vision(cnn, URL, local=False)
+</code>
+  </pre>
+<p>Here is a test of my two dearest babies:</p>
+<div class="container" style="margin-left: auto;margin-right: auto;width: 600px;">
+    <img class="materialboxed" data-caption="" width="200" src="ml/dog_vision/test.png" style="background-color:white;">
+</div>
+<ul>
+  If you are interested in the codes I used, you can find everything in
+  <li>my Github repository : <i class="material-icons" href="https://github.com/Sithlord-dev/Dog_vision">link</i></li>
+  <li>my Colab's notebook : <a href="https://colab.research.google.com/github/Sithlord-dev/Dog_vision/blob/main/Dog_bread_classification.ipynb">
+<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a></li>
+</ul>
+I also recommand Jason Brownlee's amazing books <a href="https://machinelearningmastery.com/deep-learning-with-python/"> Deep Learning With Python</a>
+as well as the incredible content of his <a href ="https://machinelearningmastery.com/">website</a>,
+and François Chollet's very complete book <a href="Deep Learning With Python">Deep Learning With Python</a>
+which helped a lot during this project, and most of my projects.</p>
+    </div>
+ </div>
+</div>
+</div>
+</div>
+</div>

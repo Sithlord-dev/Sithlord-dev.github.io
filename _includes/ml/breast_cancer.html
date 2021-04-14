@@ -1,0 +1,641 @@
+<div class="container">
+
+<!-- Start of rows div -->
+<div class="row">
+
+  <div class="col s12 m13" style="padding-top: 30px; padding-right: 30px; padding-left: 30px;">
+   <div class="card z-depth-0" style="padding-top: 20px; padding-right: 10px; padding-left: 10px;">
+   <h3 class="center-align" style="padding-right: 20px; padding-left: 20px;"">Breast tumours diagnostic using Logistic regression and support vector machine</h3>
+   <p class="grey-text center-align">6th february 2019</p>
+     <div class="center-align">
+     <div class="chip">
+        Machine learning
+        </div>
+        <div class="chip">
+        Binary label classification
+        </div>
+        <div class="chip">
+        python
+        </div>
+        <div class="chip">
+        Scikit learn
+        </div>
+      </div>
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+
+    <div class="card-content" style="font-size: 18px; color: #212121;">
+    <div class="sharethis-inline-share-buttons"></div>
+    <p>We will use a basic Machine Learning framework to perform a binary classification
+    task based on medical examination results performed on patients with and without a
+  breast tumour, in order to guess if a tumour is <em>malignant</em> or <em>benign</em></p>
+
+      <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+        <IMG src="ml/breast_cancer/breast_cancer.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;">
+      </div>
+
+
+          <p>The original data is taken from the <a href="https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic">Breast Cancer Wisconsin (Diagnostic) Data Set</a>)
+            from UCI Machine Learning Repository. This is a very simple and compact example of a
+          basic Machine Learning binary classification workflow.</p>
+
+
+    <div id="title1" style="margin-top:50px;">
+      <h4><a href="#title1"><i class="material-icons">code</i></a>Breast tumour diagnosis</h4>
+    </div>
+    <p>Here is a short summary of what we will be doing:</p>
+    <ul class="collection">
+    <li class="collection-item"><strong>Data analysis</strong> - We prepare, study and explore the dataset, highliting important correlations.</li>
+    <li class="collection-item"><strong>Model modelling</strong> - we create and train a model to predict a target variable, then we tune the hyper-parameters of our model in order to improve it if possible.</li>
+    <li class="collection-item"><strong>Model evaluation and comparison</strong> - we evaluate it using some metrics and compare them to find the best one.  </li>
+    <li class="collection-item"><strong>Model experimentation</strong> - we try to improve the model through experimentation by starting with 1000 images to make sure it works.</li>
+    <li class="collection-item"><strong>Feature importance</strong> - we highlight the important parameters in predictiong the nature of a mamal tumour.</li>
+    <li class="collection-item"><strong>Conclusion</strong></li>
+    </ul>
+    <p>To work through these topics, we will use <mark style="background-color: #e4e6e8"><code>Scikit learn</code></mark>, <mark style="background-color: #e4e6e8"><code>matplotlib</code></mark> and <mark style="background-color: #e4e6e8"><code>pandas</code></mark>.</p>
+    <p>Let's import the main modules and libraries we will be working with:</p>
+    <pre class="prettyprint">
+<code class="language-python">
+  ## Data analysis libraries
+  import numpy as np
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import seaborn as sns
+  from scipy.stats import linregress, norm
+
+  ## Scikit Learn Models:
+  from sklearn.linear_model import LogisticRegression
+  from sklearn.neighbors import KNeighborsClassifier
+  from sklearn.svm import SVC
+  from sklearn.naive_bayes import GaussianNB
+
+  ## Scikit Learn Model evaluators
+  from sklearn.model_selection import train_test_split, cross_val_score
+  from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
+  from sklearn import metrics
+  from sklearn.metrics import confusion_matrix, roc_curve, classification_report
+  from sklearn.metrics import precision_score, recall_score, f1_score
+  from sklearn.metrics import plot_roc_curve
+
+  ## Scikit Learn preprocessing
+  from sklearn.preprocessing import StandardScaler
+  from sklearn.decomposition import PCA
+</code>
+    </pre>
+<h4> 1. Data analysis: </h4>
+The rows in the dataset represent the 569 patients and the columns represent 30 characteristics of the cell nuclei present in image of a fine needle aspirate (FNA) of a breast mass. We use the dataset to make a prediction on our target variable:
+<table class="striped">
+<thead>
+<tr>
+<th style="text-align:right"></th>
+<th style="text-align:left">Features</th>
+<th style="text-align:left">Variable Type</th>
+<th style="text-align:left">Variable</th>
+<th style="text-align:left">Value Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">0</td>
+<td style="text-align:left">Radius (mean)</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">radius_m</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">1</td>
+<td style="text-align:left">Texture (mean)</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">texture_m</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">2</td>
+<td style="text-align:left">Perimeter (mean)</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">perimeter_m</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">3</td>
+<td style="text-align:left">Area (mean)</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">area_m</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">4</td>
+<td style="text-align:left">Smoothness (mean)</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">smoothness_m</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">5</td>
+<td style="text-align:left">Compactness (mean)</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">compactness_m</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">6</td>
+<td style="text-align:left">Concavity (mean)</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">concavity_m</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">7</td>
+<td style="text-align:left">Concave points (mean)</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">cp_m</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">8</td>
+<td style="text-align:left">Symmetry (mean)</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">symmetry_m</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">9</td>
+<td style="text-align:left">Fractal dimension (mean)</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">fd_m</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">10</td>
+<td style="text-align:left">Radius error</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">radius_std</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">11</td>
+<td style="text-align:left">Texture error</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">texture_std</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">12</td>
+<td style="text-align:left">Perimeter error</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">perimeter_std</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">13</td>
+<td style="text-align:left">Area error</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">area_std</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">14</td>
+<td style="text-align:left">Smoothness error</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">smoothness_std</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">15</td>
+<td style="text-align:left">Compactness error</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">compactness_std</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">16</td>
+<td style="text-align:left">Concavity error</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">concavity_std</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">17</td>
+<td style="text-align:left">Concave points error</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">cp_std</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">18</td>
+<td style="text-align:left">Symmetry error</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">symmetry_std</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">19</td>
+<td style="text-align:left">Fractal dimension error</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">fd_std</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">20</td>
+<td style="text-align:left">Worst radius</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">radius_L</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">21</td>
+<td style="text-align:left">Worst texture</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">texture_L</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">22</td>
+<td style="text-align:left">Worst perimeter</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">perimeter_L</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">23</td>
+<td style="text-align:left">Worst area</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">area_L</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">24</td>
+<td style="text-align:left">Worst smoothness</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">smoothness_L</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">25</td>
+<td style="text-align:left">Worst compactness</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">compactness_L</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">26</td>
+<td style="text-align:left">Worst concavity</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">concavity_L</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">27</td>
+<td style="text-align:left">Worst concave points</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">cp_L</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">28</td>
+<td style="text-align:left">Worst symmetry</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">symmetry_L</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">29</td>
+<td style="text-align:left">Worst fractal dimension</td>
+<td style="text-align:left">Statistical Feature</td>
+<td style="text-align:left">fd_L</td>
+<td style="text-align:left">float</td>
+</tr>
+<tr>
+<td style="text-align:right">30</td>
+<td style="text-align:left">Type of tumour</td>
+<td style="text-align:left">Target Variable</td>
+<td style="text-align:left">target</td>
+<td style="text-align:left">categorical code: 0 = Malignant; 1 = Benign</td>
+</tr>
+</tbody>
+</table>
+<p>We start by reading our CSV file using `pandas`, into a (5 rows × 31 columns) DataFrame</p>
+<pre class="prettyprint">
+<code class="language-python">
+  cancer_df = pd.DataFrame(np.c_[cancer['data'], cancer['target']], columns = np.append(cancer['feature_names'], ['target']))
+
+  cancer_df.head()
+</code>
+</pre>
+<p>and have a look at how many positive and negative samples there are:</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/dist.png" style="background-color:white;">
+</div>
+<p>Since the values are not too close to each other, this suggests that the
+  <code>target</code> is no too unbalanced. We can plot some features and observe
+  somehow how our features are related: For example, we plot the mean radius and
+  smoothness of the tumours in both cases:</p>
+  <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+      <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/var_dist.png" style="background-color:white;">
+  </div>
+  <p>We can see that benign tumours tend to be smaller in radius than the malignant
+  ones. We can alos observe how some features overlap, which would make it hard to
+  diagnose them:</p>
+  <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+      <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/var_dist2.png" style="background-color:white;">
+  </div>
+  <h5>Corr matrix:</h5>
+<p>We explore some possible correlation between independent variables, as
+  this may suggest which independent variables may or may not have an impact on our target variable:</p>
+  <pre class="prettyprint">
+  <code class="language-python">
+  corr_mtrx = cancer_df.corr()
+
+  #Mask the upper triangle:
+  mask = np.triu(np.ones(corr_mtrx.shape),0)
+  </code>
+  </pre>
+  <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+      <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/corr_mtrx.png" style="background-color:white;">
+ </div>
+
+For higher accuracy, we will normalize our data. We use min-max normalization : <blockquote>$\displaystyle{ X_n = \frac{X - X_{min}}{X_{max} - X_{min}} }$</blockquote>
+and standard scaling :
+<blockquote>$\displaystyle{ X_{sc} = \frac{X - \mathrm{mean}(X)}{\mathrm{std}{(X)}} }$</blockquote>$
+
+<p>We split our data into train and test sets:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  np.random.seed(1729)
+
+  X = cancer_df.drop('target', axis = 1)
+  y = cancer_df['target']
+
+  # Non-normalized datasets
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25)
+
+  # Normalized datasets
+  Xn_train = ( X_train - X_train.min() ) / ((X_train - X_train.min()).max())
+  Xn_test = ( X_test - X_test.min() ) / ((X_test - X_test.min()).max())
+
+  # Scaled datasets
+  scaler = StandardScaler()
+  Xsc_train = scaler.fit_transform(X_train)
+  Xsc_test = scaler.fit_transform(X_test)
+
+  # Using PCA
+  pca = PCA(n_components=3)
+  Xpca_train = pca.fit_transform(Xsc_train)
+  Xpca_test = pca.fit_transform(Xsc_test)
+</code>
+</pre>
+<p>Our model is about <strong>classification</strong>, where we are predicting a <strong>categorical variable</strong> : <code>target</code>. It has <strong>labeled data</strong> of less than 100.000 samples. Using Scikit Learn&#39;s <a href="https://scikit-learn.org/stable/user_guide.html">documentation</a> we opt for the following models:</p>
+<ul>
+<li>Log Reg : <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html">LogisticRegression</a></li>
+<li>K-Nearest Neighbors : <a href="https://scikit-learn.org/stable/modules/neighbors.html">KNeighborsClassifier</a></li>
+<li>SVC : <a href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC">Support Vector Classification</a></li>
+<li>Gaussian NB : <a href="https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html#sklearn.naive_bayes.GaussianNB">Gaussian Naive Bayes</a></li>
+</ul>
+<p>We test which model performs best: </p>
+<pre class="prettyprint">
+<code class="language-python">
+  # Instantiate each model in a dictionary
+  models = {'logReg': LogisticRegression(max_iter = 5000),
+            'KNN': KNeighborsClassifier(),
+            'SVC': SVC(),
+            'GNB': GaussianNB()}
+
+  # Create function to fit and score models
+  def mod_score(models, X_train, X_test, y_train, y_test):
+    '''
+    Takes a dictionarry of models and fits each on a training set and returns its score on a test set
+    '''
+    # Fix randomness
+    np.random.seed(1729)
+    # empty dict to append
+    results = {}
+
+    for name, model in models.items() :
+        model.fit(X_train, y_train)
+        results[name] = model.score(X_test, y_test)
+
+    return results
+
+  # score the resultes
+  mod_scores = mod_score(models, X_train, X_test, y_train, y_test)
+</code>
+</pre>
+<p>We finally get the follwoing results:</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/mod_perf.png" style="background-color:white;">
+</div>
+<h5>Hyper-parameters tuning:</h5>
+<p>For lack of data samples (only 569) we cannot use a validation set to tune our
+  models, we use *k-cross-validation* instead. We will use <mark style="background-color: #e4e6e8"><code>RandomizedSearchCV</code></mark></p>
+  <pre class="prettyprint">
+  <code class="language-python">
+    # logReg hyperparameters
+    logReg_grid = { 'C': np.logspace(-4, 4, 50),
+               'solver': ['liblinear'],
+             'penalty' : ['l1', 'l2']}
+
+    # SVC hyperparameters
+    lSVC_grid = [{'C': [1, 10, 100, 1000],
+                 'kernel': ['linear']},
+                {'C': [0.1, 1, 10, 100],
+                'gamma': [1, 0.1, 0.01, 0.001],
+                'kernel': ['rbf']}]
+
+    # KNN hyperparameters
+    KNN_grid = {'n_neighbors': [3, 4, 5, 10],
+                  'weights': ['uniform', 'distance'],
+                  'algorithm' : ['auto', 'ball_tree', 'kd_tree', 'brute'],
+                  'leaf_size' : [10, 20, 30, 50],
+                  'p' : [1,2]}
+
+    # GaussianNB hyperparameters
+    GNB_grid = {'var_smoothing': np.logspace(0,-9, num=100)}
+  </code>
+  </pre>
+<p>We can visually make a comparison of the performences:</p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/mod_perf_CV.png" style="background-color:white;">
+</div>
+We clearly see that SVC performed the best, with scaling and the parameters:
+<pre class="prettyprint">
+<code class="language-python">
+  SVC(C = 10, kernel = 'linear', probability=True)
+</code>
+</pre>
+<h4>3. Model evaluation</h4>
+<p>We make our predictions:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  # Instantiate best model with best hyperparameters
+  clf = SVC(C = 10, kernel = 'linear', probability=True).fit(Xsc_train, y_train);
+
+  # Make predictions
+  y_preds = clf.predict(Xsc_test)
+</code>
+</pre>
+<h5>3.1. Confusion matrix:</h5>
+<pre class="prettyprint">
+<code class="language-python">
+conf_mtrx = confusion_matrix(y_test, y_preds)
+</code>
+</pre>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/conf_mtrx.png" style="background-color:white;">
+</div>
+<h5>ROC Curve and AUC Scores</h5>
+<p>We basically compare the true positive rate to the false positive rate, i.e.
+a malignant diagnosis of a tumour, that is actually benign vs a benign diagnosis of a tumour,
+that is actually malignant (this last case is more dangerous)</p>
+<pre class="prettyprint">
+<code class="language-python">
+fpr, tpr, thresholds = roc_curve(y_test, clf.predict_proba(Xsc_test)[:, 1])
+</code>
+</pre>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/roc.png" style="background-color:white;">
+</div>
+<h5>3.3. Classification report</h5>
+<p>Let's have a look at the main evaluation metrics:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  # Create a classification report using the classification_report function
+  report = classification_report(y_test, y_preds, output_dict=True)
+
+  pd.DataFrame(report).T
+</code>
+</pre>
+<table border="1" class="striped">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>precision</th>
+      <th>recall</th>
+      <th>f1-score</th>
+      <th>support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0.0</th>
+      <td>0.981132</td>
+      <td>0.981132</td>
+      <td>0.981132</td>
+      <td>53.000000</td>
+    </tr>
+    <tr>
+      <th>1.0</th>
+      <td>0.988889</td>
+      <td>0.988889</td>
+      <td>0.988889</td>
+      <td>90.000000</td>
+    </tr>
+    <tr>
+      <th>accuracy</th>
+      <td>0.986014</td>
+      <td>0.986014</td>
+      <td>0.986014</td>
+      <td>0.986014</td>
+    </tr>
+    <tr>
+      <th>macro avg</th>
+      <td>0.985010</td>
+      <td>0.985010</td>
+      <td>0.985010</td>
+      <td>143.000000</td>
+    </tr>
+    <tr>
+      <th>weighted avg</th>
+      <td>0.986014</td>
+      <td>0.986014</td>
+      <td>0.986014</td>
+      <td>143.000000</td>
+    </tr>
+  </tbody>
+</table>
+<p></p>
+
+<p>Finally, we use a 5-fold <code>cross_val_score()</code> to <em>Cross-validate</em> our
+  metrics</p>
+  <pre class="prettyprint">
+  <code class="language-python">
+    # cross-validated accuracy
+    cv_acc = np.mean(cross_val_score(clf, X, y, scoring = "accuracy", cv = 5))
+
+    # cross-validated precision
+    cv_prec = np.mean(cross_val_score(clf, X, y, scoring = "precision", cv = 5))
+
+    # cross-validated recall
+    cv_recall = np.mean(cross_val_score(clf, X, y, scoring = "recall", cv = 5))
+
+    # cross-validated f1-score
+    cv_f1 = np.mean(cross_val_score(clf, X, y, scoring = "f1", cv = 5))
+  </code>
+  </pre>
+<p>and have a better and more accurate estimation of how our model is doing:</p>
+<pre class="prettyprint">
+<code class="language-python">
+  <span class="nocode" style="color:white;">
+  >>>
+      accuracy : 95.26%
+      precision : 95.89%
+      recall : 96.64%
+      f1 score : 96.24%
+  </code>
+  </pre>
+  <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+      <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/SVC_CV.png" style="background-color:white;">
+  </div>
+<h5>4. feature importance</h5>
+<p>Finally, we will find which features were important in order to predict malignant
+  turmours from benigns using the results we had, or similarily: </p>
+<p><strong>Which charateristics contribute the most to SVC predicting whether a tumour
+  is malignant or not?</strong></p>
+  <pre class="prettyprint">
+  <code class="language-python">
+    #get the coefficients from SCV
+    clf.coef_
+
+    # Match features to columns of our df
+    features_dict = dict(zip(cancer_df.columns, list(clf.coef_[0])))
+  </code>
+  </pre>
+  <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+      <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/feature_imp.png" style="background-color:white;">
+  </div>
+<p>We can already see that our model is learning and figuring out some patterns to
+  guess malignant and bnign cases: </p>
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <img class="materialboxed" data-caption="" width="550" src="ml/breast_cancer/pattern.png" style="background-color:white;">
+</div>
+<p>We see for example that it relies more on the standard deviation of the fractal d
+  imension of a tumour to eliminate the malignant cases :</p>
+  <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+      <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/std.png" style="background-color:white;">
+  </div>
+  <p>and, on the other hand, relies more on the largest area as well as the standard
+    deviation of the area to detect malignant tumours.</p>
+    <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+        <img class="materialboxed" data-caption="" width="550" src="ml/breast_cancer/pattern2.png" style="background-color:white;">
+    </div>
+    <h4>Conclusion</h4>
+    <p>We analysed our sample and trained a model that reached up to 98.60%% on
+      score accuracy and 95.26% on cross-validated accuracy. As our model here
+      is pretty much balanced we would want to aim for a very high **accuracy**
+      (of at least > 95%). However, we would still like to aim for a higher recall,
+      and thus reducing the values of false negatives (which in this case is ) from 1 to 0.</p>
+<h4>5. Future developpement:</h4>
+      <p>I would like to work on an X-ray scan classification, using image segmentation
+      or image classification, I think I saw a competition about that in Kaggle. Maybe in a near future!</p>
+      <ul>
+        If you are interested in the codes I used, you can find everything in
+        <li>my Github repository : <i class="material-icons" href="https://github.com/Sithlord-dev/Breast_tumour_diagnosis">link</i></li>
+        <li>my Colab's notebook : <a href="https://colab.research.google.com/github/Sithlord-dev/Breast_tumour_diagnosis/blob/main/Breast cancer classification.ipynb">
+      <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+      </a></li>
+        </ul>
+          </div>
+       </div>
+      </div>
+      </div>
+      </div>
+      </div>
