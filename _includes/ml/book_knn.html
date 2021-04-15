@@ -44,7 +44,7 @@
     <p>We will create a book recommendation algorithm using Scikit learn&#39;s <a href="https://scikit-learn.org/stable/modules/neighbors.html">K-Nearest Neighbors</a>.
       Here is a short summary of what we will be doing:</p>
     <ul class="collection">
-    <li class="collection-item"><strong>Data analysis</strong> - We prepare, study and explore the dataset, highliting important correlations.</li>
+    <li class="collection-item"><strong>Data analysis</strong> - we prepare, study and explore the dataset, highliting important correlations.</li>
     <li class="collection-item"><strong>Model modelling</strong> - we create and train a model to predict a target variable, then we tune the hyper-parameters of our model in order to improve it if possible.</li>
     <li class="collection-item"><strong>Model evaluation and comparison</strong> - we evaluate it using some metrics and compare them to find the best one.  </li>
     <li class="collection-item"><strong>Model experimentation</strong> - we try to improve the model through experimentation.</li>
@@ -98,7 +98,7 @@
 </pre>
 <p>As our recommendation engine is based on user's ratings, we can start by gathering
 some information about users, say we have a look at the age distribution: We observe
-that mMost of the active users are between 20 and 30. </p>
+that most of the active users are between 20 and 30. </p>
 <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
     <img class="materialboxed" data-caption="" width="400" src="ml/book_knn/age_dist.png" style="background-color:white;">
 </div>
@@ -168,7 +168,7 @@ that mMost of the active users are between 20 and 30. </p>
     </tr>
   </tbody>
 </table>
-<p>The ratings are very much unevenly distributed: There are books that are VERY much
+<p>The ratings are very much unevenly distributed: there are books that are VERY much
   rated, while some have almost no ratings.</p>
 <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
     <img class="materialboxed" data-caption="" width="400" src="ml/book_knn/uneven_dist.png" style="background-color:white;">
@@ -309,7 +309,7 @@ Let's see the 5 most rated books:</p>
   </tbody>
 </table>
 
-  <p>This makes sense somehow, people tend to rate a lot or books they love, or books
+  <p>This makes sense somehow, people tend to rate a lot books they love, or those
   they hate.</p>
 
 <h5>Correlation analysis:</h5>
@@ -424,7 +424,7 @@ davinci_corr = pd.DataFrame(df_ratings_mtrx.corrwith(df_ratings_mtrx['0385504209
   </table>
 
 <p>This suggests that the correlation does work indeed, as we have a first suggestion
-  that is from the same author, and the fours others are all Mystery/Thrillers genre.</p>
+  that is from the same author, and the four others are all Mystery/Thrillers genre.</p>
 <h4>Data modelling</h4>
 <p>We convert our DataFrame into a <code>scipy</code> <a href="https://en.wikipedia.org/wiki/Sparse_matrix#Symmetric">sparse matrix</a>
   and fill the missing values with zeros (since we actually will calculate distances between rating vectors)</p>
@@ -438,7 +438,7 @@ davinci_corr = pd.DataFrame(df_ratings_mtrx.corrwith(df_ratings_mtrx['0385504209
 </code>
   </pre>
 <p>We use the k-nearest neighbors algorithm from `KNN`: We choose the <mark style="background-color: #e4e6e8"><code>metric=cosine</code></mark>
-  to calculate thr cosine similarity between rating vectors</p>
+  to calculate the cosine similarity between rating vectors</p>
   <pre class="prettyprint">
 <code class="language-python">
   history = NearestNeighbors(algorithm='brute',
@@ -480,8 +480,7 @@ davinci_corr = pd.DataFrame(df_ratings_mtrx.corrwith(df_ratings_mtrx['0385504209
       return recommendations
 </code>
 </pre>
-<p>And we test it: here I picked the same book <em>The Da Vinci Code</em> from
-  the green Mile series</p>
+<p>And we test it: here I picked the same book <em>The Da Vinci Code</em></p>
   <pre class="prettyprint">
   <code class="language-python">
     get_recommends(book = "The Da Vinci Code");
@@ -514,7 +513,7 @@ davinci_corr = pd.DataFrame(df_ratings_mtrx.corrwith(df_ratings_mtrx['0385504209
       return comp[:5]
 </code>
 </pre>
-<p>And we try to get suggestions, say <em>memoirs of a Geisha</em>:</p>
+<p>And we try to get suggestions, say <em>Memoirs of a Geisha</em>:</p>
 <pre class="prettyprint">
 <code class="language-python">
   title_suggest("Memoirs of a Geisha");
