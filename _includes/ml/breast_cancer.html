@@ -28,7 +28,7 @@
     <div class="sharethis-inline-share-buttons"></div>
     <p>We will use a basic Machine Learning framework to perform a binary classification
     task based on medical examination results performed on patients with and without a
-  breast tumour, in order to guess if a tumour is <em>malignant</em> or <em>benign</em></p>
+  breast tumour, in order to guess if a tumour is <em>malignant</em> or <em>benign</em>.</p>
 
       <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
         <IMG src="ml/breast_cancer/breast_cancer.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;">
@@ -45,7 +45,7 @@
     </div>
     <p>Here is a short summary of what we will be doing:</p>
     <ul class="collection">
-    <li class="collection-item"><strong>Data analysis</strong> - We prepare, study and explore the dataset, highliting important correlations.</li>
+    <li class="collection-item"><strong>Data analysis</strong> - we prepare, study and explore the dataset, highliting important correlations.</li>
     <li class="collection-item"><strong>Model modelling</strong> - we create and train a model to predict a target variable, then we tune the hyper-parameters of our model in order to improve it if possible.</li>
     <li class="collection-item"><strong>Model evaluation and comparison</strong> - we evaluate it using some metrics and compare them to find the best one.  </li>
     <li class="collection-item"><strong>Model experimentation</strong> - we try to improve the model through experimentation by starting with 1000 images to make sure it works.</li>
@@ -334,7 +334,7 @@ The rows in the dataset represent the 569 patients and the columns represent 30 
       <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/var_dist.png" style="background-color:white;">
   </div>
   <p>We can see that benign tumours tend to be smaller in radius than the malignant
-  ones. We can alos observe how some features overlap, which would make it hard to
+  ones. We can also observe how some features overlap, which would make it hard to
   diagnose them:</p>
   <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
       <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/var_dist2.png" style="background-color:white;">
@@ -425,8 +425,9 @@ and standard scaling :
     <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/mod_perf.png" style="background-color:white;">
 </div>
 <h5>Hyper-parameters tuning:</h5>
-<p>For lack of data samples (only 569) we cannot use a validation set to tune our
-  models, we use *k-cross-validation* instead. We will use <mark style="background-color: #e4e6e8"><code>RandomizedSearchCV</code></mark></p>
+<p>For lack of data samples (only 569) we cannot use a validation set to tune our 
+  models, we use <em>k-cross-validation</em> instead. We will use 
+  <mark style="background-color: #e4e6e8"><code>RandomizedSearchCV</code></mark></p>
   <pre class="prettyprint">
   <code class="language-python">
     # logReg hyperparameters
@@ -577,7 +578,7 @@ fpr, tpr, thresholds = roc_curve(y_test, clf.predict_proba(Xsc_test)[:, 1])
   <span class="nocode" style="color:white;">
   >>>
       accuracy : 95.26%
-      precision : 95.89%
+      precision : 95.89%he fractal dimension o
       recall : 96.64%
       f1 score : 96.24%
   </code>
@@ -603,12 +604,12 @@ fpr, tpr, thresholds = roc_curve(y_test, clf.predict_proba(Xsc_test)[:, 1])
       <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/feature_imp.png" style="background-color:white;">
   </div>
 <p>We can already see that our model is learning and figuring out some patterns to
-  guess malignant and bnign cases: </p>
+  guess malignant and benign cases: </p>
 <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
     <img class="materialboxed" data-caption="" width="550" src="ml/breast_cancer/pattern.png" style="background-color:white;">
 </div>
-<p>We see for example that it relies more on the standard deviation of the fractal d
-  imension of a tumour to eliminate the malignant cases :</p>
+<p>We see for example that it relies more on the standard deviation of the fractal
+  dimension of a tumour to eliminate the malignant cases :</p>
   <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
       <img class="materialboxed" data-caption="" width="400" src="ml/breast_cancer/std.png" style="background-color:white;">
   </div>
@@ -621,8 +622,8 @@ fpr, tpr, thresholds = roc_curve(y_test, clf.predict_proba(Xsc_test)[:, 1])
     <p>We analysed our sample and trained a model that reached up to 98.60%% on
       score accuracy and 95.26% on cross-validated accuracy. As our model here
       is pretty much balanced we would want to aim for a very high **accuracy**
-      (of at least > 95%). However, we would still like to aim for a higher recall,
-      and thus reducing the values of false negatives (which in this case is ) from 1 to 0.</p>
+      (of at least > 95%). However, we would still like to aim for a higher recall
+      and thus, reducing the values of false negatives (which in this case is ) from 1 to 0.</p>
 <h4>5. Future developpement:</h4>
       <p>I would like to work on an X-ray scan classification, using image segmentation
       or image classification, I think I saw a competition about that in Kaggle. Maybe in a near future!</p>
