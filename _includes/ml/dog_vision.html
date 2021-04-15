@@ -29,8 +29,8 @@
 
     <div class="card-content" style="font-size: 18px; color: #212121;">
     <div class="sharethis-inline-share-buttons"></div>
-    <p>In this multi-class image classification project, we use Deep Learning, and particularily convolutional neural
-      networks to build a model that will help us identify up to 120 different breeds
+    <p>In this multi-class image classification project, we use Deep Learning, and particularily Convolutional Neural
+      Networks to build a model that will help us identify up to 120 different breeds
       of dogs 🐩</p>
 
     <p>We will use <a href="https://www.kaggle.com/c/dog-breed-identification/overview">Kaggle dog breed identification competition</a>
@@ -44,12 +44,12 @@
     <div id="title1" style="margin-top:50px;">
       <h4><a href="#title1"><i class="material-icons">code</i></a> Multi-label image classification:</h4>
     </div>
-    <p>In image classification problems, convolutional neural networks (CNN for short)
+    <p>In image classification problems, Convolutional Neural Networks (CNN for short)
       are somehow one of the most popular and effective neural network models to
       consider, especially if it is combined with Data augumentation.</p>
     <p>Here is a short summary of what we will be doing:</p>
     <ul class="collection">
-    <li class="collection-item"><strong>Data analysis</strong> - We prepare, study and explore the dataset, highliting important correlations.</li>
+    <li class="collection-item"><strong>Data analysis</strong> - we prepare, study and explore the dataset, highliting important correlations.</li>
     <li class="collection-item"><strong>Model modelling</strong> - we create and train a model to predict a target variable, then we tune the hyper-parameters of our model in order to improve it if possible.</li>
     <li class="collection-item"><strong>Model evaluation and comparison</strong> - we evaluate it using some metrics and compare them to find the best one.  </li>
     <li class="collection-item"><strong>Model experimentation</strong> - we try to improve the model through experimentation by starting with 1000 images to make sure it works.</li>
@@ -110,8 +110,8 @@
   train_df.head()
 </code>
     </pre>
-<p>We have in total 10.222 images ids with a total of 120 breed. Our dataFrame looks
-like this: The rows in the dataset represent image ids for each dog breed.</p>
+<p>We have in total 10.222 images IDs with a total of 120 breeds. Our DataFrame looks
+like this: The rows in the dataset represent image IDs for each dog breed.</p>
 <div class="container">
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -168,7 +168,7 @@ like this: The rows in the dataset represent image ids for each dog breed.</p>
 </div>
 </div>
 
-<p> We check how these <strong>labels</strong> are distributed: We have an average of 82 picture per breed</p>
+<p> We check how these <strong>labels</strong> are distributed: We have an average of 82 pictures per breed</p>
 <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
     <img class="materialboxed" data-caption="" width="400" src="ml/dog_vision/label_dist.png" style="background-color:white;">
 </div>
@@ -236,7 +236,7 @@ to create a validation set: Here, we will first train our model on a subset of <
         return img, label
   </code>
   </pre>
-  <p> and we create a function that will creates small batches:</p>
+  <p> and we create a function that will create small batches:</p>
   <pre class="prettyprint">
   <code class="language-python">
     # Define a batch size
@@ -278,7 +278,7 @@ to create a validation set: Here, we will first train our model on a subset of <
             return data_batch
   </code>
   </pre>
-<p>Now, we batch our dat sets:</p>
+<p>Now, we batch our data sets:</p>
 <pre class="prettyprint">
 <code class="language-python">
   train_data = Batch(X_train, y_train)
@@ -292,8 +292,8 @@ Our batches now have the following attributes:
   TensorSpec(shape=(None, 120), dtype=tf.bool, name=None))</span>
 </code>
 </pre>
-<h5>2. Data moddeling:</h5>
-<p>We will test our data set and our modelisation usibng Transfer learning: we will
+<h5>2. Data modeling:</h5>
+<p>We will test our data set and our modelisation using Transfer learning: we will
   use a very known and pretrained model for dog related classifications: <a href="https://tfhub.dev/google/imagenet/mobilenet_v2_140_224/classification/4">Mobilenet v2</a>
   from <a href="https://tfhub.dev/s?dataset=imagenet-ilsvrc-2012-cls&amp;module-type=image-classification">Tensorflow Hub</a></p>
   <h5>2.1. Instantiate a pre-trained model:</h5>
@@ -377,7 +377,7 @@ Our batches now have the following attributes:
     return model
 </code>
 </pre>
-<p>and we train our model: The first impression that we get is that the model is
+<p>And we train our model: The first impression that we get is that the model is
 clearly overfitting: its performance on the training test outstands its results
 on the validation set</p>
 <pre class="prettyprint">
@@ -401,7 +401,7 @@ on the validation set</p>
 model.evaluate(val_data)
 </code>
 </pre>
-<p> we see that we reach an accuracy of 82% with a loss of 0.64</p>
+<p> We see that we reach an accuracy of 82% with a loss of 0.64</p>
 <pre class="prettyprint">
 <code>
 <span class="nocode" style="color:white;">
@@ -440,7 +440,7 @@ predictions = model.predict(val_data, verbose=1)
     report_df
   </code>
   </pre>
-  <table border="1" class="striped">
+  <table border="1" class="striped" style='margin-bottom=20px;'>
     <thead>
       <tr style="text-align: right;">
         <th></th>
@@ -530,12 +530,11 @@ predictions = model.predict(val_data, verbose=1)
       </tr>
     </tbody>
   </table>
-<p>Our model feels more confident about gessing the following breeds:</p>
+<p>Our model feels more confident about guessing the following breeds:</p>
 <pre class="prettyprint">
 <code>
   <code class="language-python">
     report_df['precision'].sort_values(ascending = False)[:10]
-  </code>
   <span class="nocode" style="color:white;">
   >>>
       japanese_spaniel               1.0
@@ -551,7 +550,7 @@ predictions = model.predict(val_data, verbose=1)
       Name: precision, dtype: float64
   </code>
 </pre>
-<p>and way about gessing the following ones:</p>
+<p>and way less about guessing the following ones:</p>
 <pre class="prettyprint">
 <code>
   <code class="language-python">
@@ -574,13 +573,13 @@ predictions = model.predict(val_data, verbose=1)
 </pre>
 <p>It does not seem too bad! Although, as we have seen in the subset training, our model
 is maybe overfitting and these results might be misleading. Let's try to improve
-our model and use a more accuracte evaluation :</p>
+our model and use a more accurate evaluation :</p>
 <h4>Model tuning</h4>
-<h5>3.1. Data augementation:</h5>
+<h5>3.1. Data augmentation:</h5>
 <p>One way to avoid that is using <a href="https://bair.berkeley.edu/blog/2019/06/07/data_aug/">Data augmentation</a>:
   we take the training images and manipulate (crop, resize) or distort them (flip, rotate)
   to create more generalized patterns for the model to learn from. </p>
-<p><strong>NOTE:</strong> Data augmentation is an <em>augementation</em> in the
+<p><strong>NOTE:</strong> Data augmentation is an <em>augmentation</em> in the
   sense where it increases the generalizability of the model, and NOT an actual
   addition or increase in the dataset, i.e. it does not increase the size of the
   dataset per se.</p>
@@ -740,7 +739,7 @@ And we can see the results:
 <li><a href="https://arxiv.org/abs/1707.07012">NasNet</a> </li>
 </ul>
 <p>We first modify our function in order to quickly and efficiently preprocess our
-  data: We chose the target size <code>(331, 331, 3)</code> because it iss the one
+  data: We chose the target size <code>(331, 331, 3)</code> because it is the one
   dictated by NasNetLarge if one loads it with <code>weights='imagnet'</code></p>
 <pre class="prettyprint">
 <code class="language-python">
@@ -764,7 +763,7 @@ And we can see the results:
   run the convolutional base once for every image. However, we will not be able to
   use data augmentation here... as using it is by far way more costly
   (we would need to add Dense layers on top of the convolutional base , by using
-  <code>DataImageGenerator</code>, and run it all on the input data)</p>
+  <code>DataImageGenerator</code>, and run it all on the input data).</p>
   <pre class="prettyprint">
   <code class="language-python">
   def get_features(model, preprocess_input, images, target_size = TARGET_SIZE):
@@ -825,7 +824,7 @@ We start our process of feature extraction:
 </code>
 </pre>
 </ul>
-<p>Finally, we stack up all our features and flatten it so we can feed it to
+<p>Finally, we stack up all our features and flatten them so we can feed them to
   our new CNN:</p>
   <pre class="prettyprint">
 <code class="language-python">
@@ -902,13 +901,13 @@ We start our process of feature extraction:
       1/1 [==============================] - 1s 801ms/step - loss: 0.0924 - accuracy: 0.9702 - val_loss: 0.5054 - val_accuracy: 0.9389
 </code>
   </pre>
-<p>We can finally evaluate our model and see how it is doing, here we choose two
-  gradient deccent optimizers: <mark style="background-color: #e4e6e8"><code>Adam</code></mark>
+<p>We can finally evaluate our model and see how it is doing. Here we choose two
+  gradient descent optimizers: <mark style="background-color: #e4e6e8"><code>Adam</code></mark>
    and <mark style="background-color: #e4e6e8"><code>RMSprop</code></mark> :</p>
    <div class="container" style="margin-left: auto;margin-right: auto;width: 600px;">
        <img class="materialboxed" data-caption="" width="500" src="ml/dog_vision/final_eval.png" style="background-color:white;">
    </div>
-<p><b>OPTIONAL:</b> As our model seem a bit space-consuming, we can choose to save
+<p><b>OPTIONAL:</b> As our model seems a bit space-consuming, we can choose to save
 it as an architecture (using the <mark style="background-color: #e4e6e8"><code>.to_json</code></mark>
 method) and weights (using the <mark style="background-color: #e4e6e8"><code>.save_weights</code></mark>
 method)</p>
@@ -923,7 +922,7 @@ method)</p>
   print("Saved model to disk")
 </code>
   </pre>
-<p>And to load, one simply uses:</p>
+<p>And to load it, one simply uses:</p>
 <pre class="prettyprint">
   <code class="language-python">
   # load json and create model
@@ -998,7 +997,7 @@ method)</p>
   #dog_vision(cnn, URL, local=False)
 </code>
   </pre>
-<p>Here is a test of my two dearest babies:</p>
+<p>Here is a test with my two dearest babies:</p>
 <div class="container" style="margin-left: auto;margin-right: auto;width: 600px;">
     <img class="materialboxed" data-caption="" width="200" src="ml/dog_vision/test.png" style="background-color:white;">
 </div>
