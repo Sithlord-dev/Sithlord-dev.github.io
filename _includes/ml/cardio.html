@@ -27,9 +27,9 @@
     <div class="card-content" style="font-size: 18px; color: #212121;">
     <div class="sharethis-inline-share-buttons"></div>
     <p>We will use a basic Machine Learning framework to perform a binary classification
-    task based on clinical examination results performed on patients with and without Cardiovascular
-    disease, in order to train a model to guess if a patient; from his medical attributes;
-    has a cardiovascular disease or not</p>
+    task based on clinical examination results performed on patients with and without cardiovascular
+    disease in order to train a model to guess if a patient, from his medical attributes,
+    has a cardiovascular disease or not.</p>
 
       <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
         <IMG src="ml/cardio/heart.jpg" data-caption="(mustafahacalaki/DigitalVision Vectors, Getty Images)" style="display: block; margin-left: auto; margin-right: auto; width: 100%;">
@@ -40,11 +40,11 @@
         We use a more compact one with relevant parameters (only 14 features) from : <a href="https://www.kaggle.com/ronitf/heart-disease-uci/">Kaggle</a>.</p>
 
     <div id="title1" style="margin-top:50px;">
-      <h4><a href="#title1"><i class="material-icons">code</i></a> Cardiovascular disease diafnosis</h4>
+      <h4><a href="#title1"><i class="material-icons">code</i></a> cardiovascular disease diagnosis</h4>
     </div>
     <p>Here is a short summary of what we will be doing:</p>
     <ul class="collection">
-    <li class="collection-item"><strong>Data analysis</strong> - We prepare, study and explore the dataset, highliting important correlations.</li>
+    <li class="collection-item"><strong>Data analysis</strong> - we prepare, study and explore the dataset, highliting important correlations.</li>
     <li class="collection-item"><strong>Model modelling</strong> - we create and train a model to predict a target variable, then we tune the hyper-parameters of our model in order to improve it if possible.</li>
     <li class="collection-item"><strong>Model evaluation and comparison</strong> - we evaluate it using some metrics and compare them to find the best one.  </li>
     <li class="collection-item"><strong>Feature importance</strong> - we highlight the important parameters in predictiong the presence of a cardiovascular disease.</li>
@@ -196,7 +196,7 @@ from various blood and medical tests.</p>
     <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio1.png" style="background-color:white;">
 </div>
 
-<p>Since the values are close to each other, this suggests that the<code>target</code>
+<p>Since the values are close to each other, this suggests that the <code>target</code>
   column can be considered <strong>balanced</strong>. </p>
 <h4>Correlation analysis</h4>
 <p>We first explore some possible correlation between independent variables, as this may suggest which independent variables may or may not have an impact on our target variable:</p>
@@ -214,14 +214,14 @@ from various blood and medical tests.</p>
   mask = np.triu(np.ones(corr_mtrx.shape),0)
 </code>
 </pre>
-<p><code>seaborn</code>'s heatmap is perfect to graphically highlits our correlations:</p>
+<p><code>seaborn</code>'s heatmap is perfect to graphically highlit our correlations:</p>
 <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
     <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio2.png" style="background-color:white;">
 </div>
 <p>A higher positive (resp. negative) value means a potential positive (resp. negative) correlation.
-  For example, we observe a negative correlation between cardiovascular diseases and gender:
-  Indeed, if we look closer, this is partially due to the fact that there are more males
-  patiens than females in the sample:</p>
+  For example, we observe a negative correlation between cardiovascular diseases and gender.
+  Indeed, if we look closer, this is partially due to the fact that there are more male
+  than female patients in the sample:</p>
 <pre class="prettyprint">
 <code class="language-python">
   heart_df['sex'].value_counts(normalize=True)
@@ -236,9 +236,9 @@ from various blood and medical tests.</p>
     <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio3.png" style="background-color:white;">
 </div>
 
-<p>We also observe a negative corrolation of <code>target</code> with age, while having
+<p>We also observe a negative correlation of <code>target</code> with age, while having
   a positive correlation with <code>thalac</code>. We try then to understand how age
-  and maximal heart rate relate in accordence to the presence or not of cardiovascular diseases:</p>
+  and maximal heart rate relate in accordence to the presence, or not, of cardiovascular diseases:</p>
 
 <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
     <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio4.png" style="background-color:white;">
@@ -247,15 +247,15 @@ from various blood and medical tests.</p>
 <p>First, we observe that the maximal heart rate regresses with age: this makes sense,
   the younger someone is, the higher its maximal heart rate is. What is also interesting
   is that the regression is more important in patients <span style='color:#502382'><strong>
-    with cardiovascular problems</strong></span>, as the slope of regression is clearly of <code>target = 1</code>
-    is clearly higher than of <code>target = 0</code>.</p>
+    with cardiovascular problems</strong></span>, as the slope of regression of <code>target = 1</code>
+    is clearly higher than that of <code>target = 0</code>.</p>
 
 <p>However, this might also be misleading due to the following fact: If we observe the age distribution of the patients</p>
 <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
     <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio5.png" style="background-color:white;">
 </div>
-<p> the <em>Kernel Density Etimate</em> is slightly swaying to the right, which also r
-  eflects in the scatter plot above as there are more <em>older</em> patients.
+<p> the <em>Kernel Density Etimate</em> is slightly swaying to the right, which also 
+  reflects in the scatter plot above as there are more <em>older</em> patients.
   On the other hand, the highest correlation on the <code>tagret</code> variable is seen
   with the <em>chest pain</em> variable <code>cp</code>:</p>
 <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
@@ -269,7 +269,7 @@ from various blood and medical tests.</p>
 <li><strong>Non-anginal pain</strong>: typically esophageal spasms (not related to the heart)</li>
 <li><strong>Asymptomatic</strong>: chest pain not showing signs of any disease</li>
 </ul>
-<p>Here, the fact that the <em>Atypical angina</em> it&#39;s not related to the heart but still seems to have a higher ratio of participants with cardiovascular disease than without. This is due to the actual definition of &#39;Atypical Angina&#39; in the medical field, which seems to be confusing. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2763472/">Source: PubMed</a></p>
+<p>Here, the fact that the <em>Atypical Angina</em> it&#39;s not related to the heart but still seems to have a higher ratio of participants with cardiovascular disease than without. This is due to the actual definition of &#39;Atypical Angina&#39; in the medical field, which seems to be confusing. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2763472/">Source: PubMed</a></p>
 
 <h4>2. Data modelling</h4>
 <p>Here we will try to build a model and train in order to predict our <code>target</code> variable:</p>
@@ -339,8 +339,8 @@ from various blood and medical tests.</p>
     <img class="materialboxed" data-caption="" width="400" src="ml/cardio/cardio7.png" style="background-color:white;">
 </div>
 
-<h4>3.Model fine tuning</h4>
-<p>We will try and normalize our datasets at first to see if it improves our scores and then fine tune the hyperparameters of our classifiers to get the best possible results:</p>
+<h4>3. Model fine tuning</h4>
+<p>We will try and normalize our datasets at first to see if it improves our scores and then, fine-tuning the hyperparameters of our classifiers to get the best possible results:</p>
 
 <h5>3.1. Datasets normalization</h5>
 
