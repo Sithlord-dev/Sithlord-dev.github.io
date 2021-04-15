@@ -27,7 +27,7 @@
 - id: 3
   title: Wild automorphisms of the complex field
   url: /docs/Wild automorphisms of the complex field.pdf
-  description: A fun little presentation I made during my bachelor degree I think, exploring the dark parts of the group of automorphisms of the complex field.
+  description: A fun little presentation I made during my bachelor degree, exploring the dark parts of the group of automorphisms of the complex field.
   cover: /assets/images/Wild.jpg
   img: /assets/images/project_covers/Wild.png
   tags: [
@@ -40,7 +40,7 @@
 - id: 4
   title: Hilbert's 5th problem
   url: /docs/Hilbert's 5th problem.pdf
-  description: Probably one of the first short talks I gave during my Differential geometry class, this one is about characterizing linear Lie groups by Von Neumann's theorem (actually, in the case of closed linear topological groups.)
+  description: Probably one of the first short talks I gave during my Differential Geometry class. This one is about characterizing linear Lie groups by Von Neumann's theorem (actually, in the case of closed linear topological groups).
   cover: /assets/images/Lie groups.jpg
   img: /assets/images/project_covers/Lie groups.png
   tags: [
