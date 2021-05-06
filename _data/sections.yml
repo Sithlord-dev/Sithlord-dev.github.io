@@ -1,5 +1,5 @@
 projects:
-  url: /projects
+  url: /projects/
   heading: Portfolio
   words: Projects and experiments I have been working on.
   class: m7 projects
